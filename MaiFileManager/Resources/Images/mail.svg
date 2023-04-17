@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Creator: CorelDRAW 2020 (64-Bit) -->
+<svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="382px" height="512px" version="1.1" style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd"
+viewBox="0 0 38.89 51.99"
+ xmlns:xlink="http://www.w3.org/1999/xlink"
+ xmlns:xodm="http://www.corel.com/coreldraw/odm/2003">
+ <defs>
+  <style type="text/css">
+   <![CDATA[
+    .fil0 {fill:#0067BD}
+    .fil2 {fill:white;fill-rule:nonzero}
+    .fil1 {fill:white;fill-opacity:0.301961}
+   ]]>
+  </style>
+ </defs>
+ <g id="Vrstva_x0020_1">
+  <metadata id="CorelCorpID_0Corel-Layer"/>
+  <path class="fil0" d="M6.76 0l17.4 0 14.73 15.36 0 29.87c0,3.73 -3.03,6.76 -6.77,6.76l-25.36 0c-3.73,0 -6.76,-3.03 -6.76,-6.76l0 -38.47c0,-3.73 3.03,-6.76 6.76,-6.76z"/>
+  <polygon class="fil1" points="24.14,0 24.14,15.24 38.89,15.24 "/>
+  <path class="fil2" d="M22.28 32.48l5.89 3.72 0 -7.59 -5.89 3.87zm-0.99 0.66l-1.55 1.02c-0.09,0.06 -0.19,0.09 -0.3,0.09 -0.1,0 -0.21,-0.03 -0.3,-0.09l-1.54 -1.02 -6.85 4.33c0.09,0.52 0.52,0.92 1.06,0.92l15.27 0c0.54,0 0.97,-0.4 1.05,-0.92l-6.84 -4.33zm5.79 -6.75l-15.27 0c-0.55,0 -0.98,0.41 -1.06,0.93l8.69 5.73 8.69 -5.73c-0.08,-0.52 -0.51,-0.93 -1.05,-0.93zm-16.36 2.22l0 7.59 5.88 -3.72 -5.88 -3.87z"/>
+ </g>
+</svg>

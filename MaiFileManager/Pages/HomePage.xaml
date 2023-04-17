@@ -2,64 +2,89 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:local="clr-namespace:MaiFileManager.Pages"
+             xmlns:classes="clr-namespace:MaiFileManager.Classes"
              x:Class="MaiFileManager.Pages.HomePage"
              x:Name="homePage"
              Title="HomePage">
     <Shell.TitleView>
         <HorizontalStackLayout>
-            <Button x:Name="BackButton"
-                    Text="&lt;"
-                    FontSize="26"
+            <ImageButton x:Name="BackButton"
+                    Source="back.png"
                     Clicked="BackButton_Clicked"
-                    HorizontalOptions="StartAndExpand"
+                    HorizontalOptions="Start"
+                    VerticalOptions="CenterAndExpand"
+                    HeightRequest="40"
+                    WidthRequest="40"
                     IsVisible="false"/>
-            <VerticalStackLayout>
-                <Label BindingContext="{x:Reference homePage}"
+            <Label BindingContext="{x:Reference homePage}"
                    Text="{Binding fileManager.DirName}"
                    HorizontalTextAlignment="Start"
                    VerticalTextAlignment="Center"
                    HorizontalOptions="StartAndExpand"
+                   VerticalOptions="CenterAndExpand"
                    TextColor="White"
                    FontAttributes="Bold"
-                   FontSize="26"/>
-                <Label BindingContext="{x:Reference homePage}"
-                   Text="{Binding fileManager.CurrentDir}"
-                   HorizontalOptions="CenterAndExpand"
-                   HorizontalTextAlignment="Start"
-                   VerticalTextAlignment="Center"
-                   TextColor="White"
-                   FontAttributes="Bold"/>
-            </VerticalStackLayout>
+                   FontSize="Title"/>
         </HorizontalStackLayout>
     </Shell.TitleView>
-    <VerticalStackLayout>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="30"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Label BindingContext="{x:Reference homePage}"
+               Text="{Binding fileManager.CurrentDir}"
+               HorizontalOptions="StartAndExpand"
+               HorizontalTextAlignment="Start"
+               VerticalTextAlignment="Center"
+               Margin="10,0"
+               LineBreakMode="HeadTruncation"
+               FontAttributes="Bold"/>
         <CollectionView x:Name="FileListView"
+                        Grid.Row="1"
                         BindingContext="{x:Reference homePage}"
                         ItemsSource="{Binding FileList}"
                         SelectionChanged="FileListView_SelectionChanged"
-                        SelectionMode="Single">
+                        SelectionMode="Single"
+                        HorizontalScrollBarVisibility="Default">
             <CollectionView.ItemTemplate>
                 <DataTemplate>
-                    <Grid Padding="10">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="Auto" />
-                        </Grid.RowDefinitions>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="Auto" />
-                        </Grid.ColumnDefinitions>
-                        <Label Grid.Column="1"
-                               Text="{Binding Name}"
-                               FontAttributes="Bold" /> 
-                        <Label Grid.Row="1"
-                               Grid.Column="1"
-                               Text="{Binding FullName}"
-                               FontAttributes="Italic"
-                               VerticalOptions="End" />
-                    </Grid>
+                    <Border 
+                        StrokeThickness="1"
+                        StrokeShape="RoundRectangle 5,5,5,5"
+                        Background="Transparent"
+                        Padding="12,8"
+                            Margin="0,1">
+                        <Grid Padding="10">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="{Binding iconSize}" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="60" />
+                            </Grid.ColumnDefinitions>
+                            <Image Source="{Binding iconPath}" 
+                                   Grid.RowSpan="2"
+                                   Margin="0,0,10,0"/>
+                            <Label Grid.Column="1"
+                            Text="{Binding fileInfo.Name}"
+                            FontAttributes="Bold" />
+                            <Label Grid.Column="2"
+                            Text="{Binding fileInfoSize}"
+                            FontAttributes="Bold" 
+                            HorizontalOptions="StartAndExpand"/>
+                            <Label Grid.Row="1"
+                            Grid.Column="1"
+                            Grid.ColumnSpan="2"
+                            Text="{Binding fileInfo.FullName}"
+                            FontAttributes="Italic"
+                            VerticalOptions="End" />
+                        </Grid>
+                    </Border>
                 </DataTemplate>
             </CollectionView.ItemTemplate>
         </CollectionView>
-    </VerticalStackLayout>
+    </Grid>
 </ContentPage>

@@ -1,11 +1,13 @@
 using System.Collections.ObjectModel;
+using System.Diagnostics;
+using MaiFileManager.Classes;
 using MaiFileManager.Services;
 
 namespace MaiFileManager.Pages;
 
 public partial class HomePage : ContentPage
 {
-	public ObservableCollection<FileSystemInfo> FileList { get; set; } = new ObservableCollection<FileSystemInfo>();
+	public ObservableCollection<FileSystemInfoWithIcon> FileList { get; set; } = new ObservableCollection<FileSystemInfoWithIcon>();
     public FileManager fileManager { get; set; } = new FileManager();
     int BackDeep;
     public HomePage()
@@ -51,14 +53,24 @@ public partial class HomePage : ContentPage
         FileList.Clear();
         foreach (FileSystemInfo info in fileManager.GetListFile())
         {
-            FileList.Add(info);
+            if (info.GetType() == typeof(FileInfo))
+            {
+                FileList.Add(new FileSystemInfoWithIcon(info, MaiIcon.GetIcon(info.Extension), 40));
+            }
+            else if  (info.GetType() == typeof(DirectoryInfo))
+            {
+                FileList.Add(new FileSystemInfoWithIcon(info, "folder.png", 45));
+            }
         }
     }
     private async void FileListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-        FileSystemInfo selected = e.CurrentSelection.FirstOrDefault() as FileSystemInfo;
+        if (sender is null) return;
+        FileSystemInfoWithIcon selectedWIcon = e.CurrentSelection.FirstOrDefault() as FileSystemInfoWithIcon;
+        FileSystemInfo selected = selectedWIcon.fileInfo;
         if (selected.GetType() == typeof(FileInfo))
         {
+            FileInfo file = (FileInfo) selected;
             await Launcher.OpenAsync(new OpenFileRequest("Open File", new ReadOnlyFile(selected.FullName)));
         }
         if (selected.GetType() == typeof(DirectoryInfo))

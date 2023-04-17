@@ -6,7 +6,7 @@
     xmlns:pages="clr-namespace:MaiFileManager.Pages">
     <TabBar>
         <ShellContent x:Name="Home"
-                      Icon="folder.png"
+                      Icon="sfolder.png"
                       Title="Files"
                       ContentTemplate="{DataTemplate pages:HomePage}"/>
         <ShellContent Icon="heart.png"

@@ -52,6 +52,7 @@
 	  <None Remove="Resources\Images\download.png" />
 	  <None Remove="Resources\Images\folder.png" />
 	  <None Remove="Resources\Images\heart.png" />
+	  <None Remove="Resources\Images\sfolder.png" />
 	</ItemGroup>
 
 	<ItemGroup>
