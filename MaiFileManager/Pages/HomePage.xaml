@@ -17,7 +17,7 @@
                     WidthRequest="40"
                     IsVisible="false"/>
             <Label BindingContext="{x:Reference homePage}"
-                   Text="{Binding fileManager.DirName}"
+                   Text="{Binding FileListObj.CurrentDirectoryInfo.DirName}"
                    HorizontalTextAlignment="Start"
                    VerticalTextAlignment="Center"
                    HorizontalOptions="StartAndExpand"
@@ -33,7 +33,7 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <Label BindingContext="{x:Reference homePage}"
-               Text="{Binding fileManager.CurrentDir}"
+               Text="{Binding FileListObj.CurrentDirectoryInfo.CurrentDir}"
                HorizontalOptions="StartAndExpand"
                HorizontalTextAlignment="Start"
                VerticalTextAlignment="Center"
@@ -43,7 +43,7 @@
         <CollectionView x:Name="FileListView"
                         Grid.Row="1"
                         BindingContext="{x:Reference homePage}"
-                        ItemsSource="{Binding FileList}"
+                        ItemsSource="{Binding FileListObj.CurrentFileList}"
                         SelectionChanged="FileListView_SelectionChanged"
                         SelectionMode="Single"
                         HorizontalScrollBarVisibility="Default">
@@ -74,12 +74,11 @@
                             <Label Grid.Column="2"
                             Text="{Binding fileInfoSize}"
                             FontAttributes="Bold" 
-                            HorizontalOptions="StartAndExpand"/>
+                            HorizontalOptions="EndAndExpand"/>
                             <Label Grid.Row="1"
                             Grid.Column="1"
                             Grid.ColumnSpan="2"
-                            Text="{Binding fileInfo.FullName}"
-                            FontAttributes="Italic"
+                            Text="{Binding lastModified}"
                             VerticalOptions="End" />
                         </Grid>
                     </Border>

@@ -1,6 +1,7 @@
 ﻿using Android;
 using Android.Content.PM;
 using Android.OS;
+using Android.Content;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -8,6 +9,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Android.Net;
 
 namespace MaiFileManager.Services
 {
@@ -20,6 +22,15 @@ namespace MaiFileManager.Services
         public FileManager() :
         this(global::Android.OS.Environment.ExternalStorageDirectory.Path)
         {
+        }
+        public FileManager(int type)
+        {
+            switch (type)
+            {
+                case 1:
+                    currentDir = Android.OS.Environment.GetExternalStoragePublicDirectory(Android.OS.Environment.DirectoryDownloads).AbsolutePath;
+                    break;
+            }
         }
         public partial ObservableCollection<FileSystemInfo> GetListFile()
         {
@@ -55,5 +66,23 @@ namespace MaiFileManager.Services
         {
             CurrentDir = Directory.GetParent(CurrentDir).FullName;
         }
+
+        //public static partial void OpenWith(string path)
+        //{
+
+        //    try
+        //    {
+        //        Intent intent = new Intent(Intent.ActionView);
+        //        Java.IO.File file = new Java.IO.File(path);
+        //        string MIMO = Java.Nio.FileNio.Files.ProbeContentType(file.ToPath());
+        //        intent.SetDataAndType(Android.Net.Uri.FromFile(file), MIMO);
+        //        Platform.CurrentActivity.StartActivity(intent);
+        //    }
+        //    catch (ActivityNotFoundException e)
+        //    {
+        //        // no Activity to handle this kind of files
+        //    }
+
+        //}
     }
 }

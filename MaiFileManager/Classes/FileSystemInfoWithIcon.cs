@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Globalization;
 
 namespace MaiFileManager.Classes
 {
@@ -13,11 +14,19 @@ namespace MaiFileManager.Classes
         public int iconSize { get; set; }
         public string fileInfoSize { get; set; }
         public string[] fileSizeMeasure { get; set; } = { "B", "K", "M", "G", "T" };
+        public string lastModified { get; set; }
         public FileSystemInfoWithIcon(FileSystemInfo fileData, string iconPathData, int iconSizeData)
         {
             fileInfo = fileData;
             iconPath = iconPathData;
             iconSize = iconSizeData;
+            ConvertFileInfoSize();
+            ConvertFileLastModified();
+            
+        }
+        public void ConvertFileInfoSize()
+        {
+
             if (fileInfo.GetType() == typeof(FileInfo))
             {
                 double tmp = (fileInfo as FileInfo).Length;
@@ -34,6 +43,11 @@ namespace MaiFileManager.Classes
             {
                 fileInfoSize = "";
             }
+        }
+
+        public void ConvertFileLastModified()
+        {
+            lastModified = fileInfo.LastWriteTime.ToString("G", CultureInfo.GetCultureInfo("vi-VN"));
         }
     }
 }
