@@ -7,8 +7,15 @@
              x:Name="homePage"
              Title="HomePage">
     <Shell.TitleView>
-        <HorizontalStackLayout>
-            <ImageButton x:Name="BackButton"
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="30"/>
+                <ColumnDefinition Width="30"/>
+                <ColumnDefinition Width="10"/>
+            </Grid.ColumnDefinitions>
+            <HorizontalStackLayout>
+                <ImageButton x:Name="BackButton"
                     Source="back.png"
                     Clicked="BackButton_Clicked"
                     HorizontalOptions="Start"
@@ -16,21 +23,31 @@
                     HeightRequest="40"
                     WidthRequest="40"
                     IsVisible="false"/>
-            <Label BindingContext="{x:Reference homePage}"
+                <Label BindingContext="{x:Reference homePage}"
                    Text="{Binding FileListObj.CurrentDirectoryInfo.DirName}"
                    HorizontalTextAlignment="Start"
                    VerticalTextAlignment="Center"
                    HorizontalOptions="StartAndExpand"
                    VerticalOptions="CenterAndExpand"
                    TextColor="White"
+                   LineBreakMode="TailTruncation"
                    FontAttributes="Bold"
                    FontSize="Title"/>
-        </HorizontalStackLayout>
+            </HorizontalStackLayout>
+            <ImageButton x:Name="CancleMultipleSelection"
+                         Grid.Column="2"
+                         HorizontalOptions="CenterAndExpand"
+                         VerticalOptions="CenterAndExpand"
+                         Source="cancel.png"
+                         IsVisible="false"
+                         Clicked="CancleMultipleSelection_Clicked"/>
+        </Grid>
     </Shell.TitleView>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="30"/>
             <RowDefinition Height="*"/>
+            <RowDefinition Height="auto"/>
         </Grid.RowDefinitions>
         <Label BindingContext="{x:Reference homePage}"
                Text="{Binding FileListObj.CurrentDirectoryInfo.CurrentDir}"
@@ -40,13 +57,44 @@
                Margin="10,0"
                LineBreakMode="HeadTruncation"
                FontAttributes="Bold"/>
+        <Border x:Name="OptionBar"
+                Grid.Row="2"
+                StrokeShape="RoundRectangle 5,5,0,0"
+                StrokeThickness="1"
+                IsVisible="false">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <CheckBox x:Name="SelectAllChk"
+                          Grid.Column="0"
+                          HorizontalOptions="Start"
+                          Margin="22,5,5,5"
+                          VerticalOptions="CenterAndExpand"
+                          HeightRequest="50"
+                          CheckedChanged="SelectAllChk_CheckedChanged"/>
+                <Button x:Name="Cut"
+                        Text="Cut"
+                        Grid.Column="1"/>
+                <Button x:Name="Copy"
+                        Text="Copy"
+                        Grid.Column="2"/>
+                <Button x:Name="Paste"
+                        Text="Paste"
+                        Grid.Column="3"/>
+            </Grid>
+        </Border>
         <CollectionView x:Name="FileListView"
                         Grid.Row="1"
                         BindingContext="{x:Reference homePage}"
                         ItemsSource="{Binding FileListObj.CurrentFileList}"
                         SelectionChanged="FileListView_SelectionChanged"
                         SelectionMode="Single"
-                        HorizontalScrollBarVisibility="Default">
+                        HorizontalScrollBarVisibility="Default"
+                        EmptyView="No File or Folder found">
             <CollectionView.ItemTemplate>
                 <DataTemplate>
                     <Border 
@@ -54,33 +102,51 @@
                         StrokeShape="RoundRectangle 5,5,5,5"
                         Background="Transparent"
                         Padding="12,8"
-                            Margin="0,1">
-                        <Grid Padding="10">
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto" />
-                                <RowDefinition Height="Auto" />
-                            </Grid.RowDefinitions>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="{Binding iconSize}" />
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="60" />
-                            </Grid.ColumnDefinitions>
-                            <Image Source="{Binding iconPath}" 
+                        Margin="0,1">
+                        <SwipeView SwipeStarted="SwipeView_SwipeStarted"
+                                   FlowDirection="LeftToRight">
+                            <SwipeView.LeftItems>
+                                <SwipeItems SwipeBehaviorOnInvoked="Close">
+                                    <SwipeItemView>
+                                        <StackLayout WidthRequest="5">
+                                        </StackLayout>
+                                    </SwipeItemView>
+                                </SwipeItems>
+                            </SwipeView.LeftItems>
+                            <Grid Padding="10, 10">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="{Binding iconSize}" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="60" />
+                                </Grid.ColumnDefinitions>
+                                <CheckBox Grid.Column="0"
+                                      Grid.RowSpan="2"
+                                      CheckedChanged="CheckBox_CheckedChanged"
+                                      IsVisible="{Binding CheckBoxSelectVisible}"
+                                      IsChecked="{Binding CheckBoxSelected}"/>
+                                <Image Source="{Binding iconPath}" 
+                                   Grid.Column="1"
                                    Grid.RowSpan="2"
                                    Margin="0,0,10,0"/>
-                            <Label Grid.Column="1"
+                                <Label Grid.Column="2"
                             Text="{Binding fileInfo.Name}"
                             FontAttributes="Bold" />
-                            <Label Grid.Column="2"
+                                <Label Grid.Column="3"
                             Text="{Binding fileInfoSize}"
                             FontAttributes="Bold" 
                             HorizontalOptions="EndAndExpand"/>
-                            <Label Grid.Row="1"
-                            Grid.Column="1"
+                                <Label Grid.Row="1"
+                            Grid.Column="2"
                             Grid.ColumnSpan="2"
                             Text="{Binding lastModified}"
                             VerticalOptions="End" />
-                        </Grid>
+                            </Grid>
+                        </SwipeView>
                     </Border>
                 </DataTemplate>
             </CollectionView.ItemTemplate>

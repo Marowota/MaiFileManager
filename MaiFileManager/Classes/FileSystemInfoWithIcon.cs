@@ -4,10 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Globalization;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 
 namespace MaiFileManager.Classes
 {
-    public class FileSystemInfoWithIcon
+    public class FileSystemInfoWithIcon : INotifyPropertyChanged
     {
         public FileSystemInfo fileInfo { get; set; }
         public string iconPath { get; set; }
@@ -15,6 +17,30 @@ namespace MaiFileManager.Classes
         public string fileInfoSize { get; set; }
         public string[] fileSizeMeasure { get; set; } = { "B", "K", "M", "G", "T" };
         public string lastModified { get; set; }
+        private bool checkBoxSelectVisible = false;
+        public bool CheckBoxSelectVisible
+        {
+            get => checkBoxSelectVisible;
+            set
+            {
+                checkBoxSelectVisible = value;
+                OnPropertyChanged(nameof(CheckBoxSelectVisible));
+            }
+        }
+        private bool checkBoxSelected = false;
+        public bool CheckBoxSelected
+        {
+            get => checkBoxSelected;
+            set
+            {
+                checkBoxSelected = value;
+                OnPropertyChanged(nameof(CheckBoxSelected));
+            }
+        }
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        public void OnPropertyChanged([CallerMemberName] string name = "") =>
+             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         public FileSystemInfoWithIcon(FileSystemInfo fileData, string iconPathData, int iconSizeData)
         {
             fileInfo = fileData;
