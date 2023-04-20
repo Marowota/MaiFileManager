@@ -95,6 +95,7 @@ public partial class HomePage : ContentPage
         }
         return true;
     }
+
     private void SwipeView_SwipeStarted(object sender, SwipeStartedEventArgs e)
     {
         (sender as SwipeView).Close();
@@ -103,6 +104,7 @@ public partial class HomePage : ContentPage
             SelecitonMode(true);
         }
     }
+
     private void CheckBox_CheckedChanged(object sender, CheckedChangedEventArgs e)
     {
         if (!IsCheckedBySelect)
@@ -111,10 +113,12 @@ public partial class HomePage : ContentPage
             IsCheckedBySelect = true;
         }
     }
+
     private void SelectAllChk_CheckedChanged(object sender, CheckedChangedEventArgs e)
     {
         AutoCheck(e.Value);
     }
+
     private void CancleMultipleSelection_Clicked(object sender, EventArgs e)
     {
         foreach (FileSystemInfoWithIcon f in FileListObj.CurrentFileList)
