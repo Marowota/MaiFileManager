@@ -68,6 +68,7 @@
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
                 <CheckBox x:Name="SelectAllChk"
                           Grid.Column="0"
@@ -78,13 +79,20 @@
                           CheckedChanged="SelectAllChk_CheckedChanged"/>
                 <Button x:Name="Cut"
                         Text="Cut"
-                        Grid.Column="1"/>
+                        Grid.Column="1"
+                        Clicked="Cut_Clicked"/>
                 <Button x:Name="Copy"
                         Text="Copy"
-                        Grid.Column="2"/>
+                        Grid.Column="2"
+                        Clicked="Copy_Clicked"/>
                 <Button x:Name="Paste"
                         Text="Paste"
-                        Grid.Column="3"/>
+                        Grid.Column="3"
+                        Clicked="Paste_Clicked"/>
+                <Button x:Name="Delete"
+                        Text="Delete"
+                        Grid.Column="4"
+                        Clicked="Delete_Clicked"/>
             </Grid>
         </Border>
         <CollectionView x:Name="FileListView"
@@ -125,26 +133,38 @@
                                     <ColumnDefinition Width="60" />
                                 </Grid.ColumnDefinitions>
                                 <CheckBox Grid.Column="0"
-                                      Grid.RowSpan="2"
-                                      CheckedChanged="CheckBox_CheckedChanged"
-                                      IsVisible="{Binding CheckBoxSelectVisible}"
-                                      IsChecked="{Binding CheckBoxSelected}"/>
+                                          Grid.RowSpan="2"
+                                          Focused="CheckBox_Focused"
+                                          HeightRequest="30"
+                                          IsVisible="{Binding CheckBoxSelectVisible}"
+                                          IsChecked="{Binding CheckBoxSelected}"
+                                          IsEnabled="False">
+                                    <CheckBox.Style>
+                                        <Style TargetType="CheckBox">
+                                            <Style.Triggers>
+                                                <Trigger TargetType="CheckBox" Property="IsEnabled" Value="False">
+                                                    <Setter Property="Color" Value="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource White}}" />
+                                                </Trigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </CheckBox.Style>
+                                </CheckBox>
                                 <Image Source="{Binding iconPath}" 
-                                   Grid.Column="1"
-                                   Grid.RowSpan="2"
-                                   Margin="0,0,10,0"/>
+                                       Grid.Column="1"
+                                       Grid.RowSpan="2"
+                                       Margin="0,0,10,0"/>
                                 <Label Grid.Column="2"
-                            Text="{Binding fileInfo.Name}"
-                            FontAttributes="Bold" />
+                                        Text="{Binding fileInfo.Name}"
+                                        FontAttributes="Bold" />
                                 <Label Grid.Column="3"
-                            Text="{Binding fileInfoSize}"
-                            FontAttributes="Bold" 
-                            HorizontalOptions="EndAndExpand"/>
+                                        Text="{Binding fileInfoSize}"
+                                        FontAttributes="Bold" 
+                                        HorizontalOptions="EndAndExpand"/>      
                                 <Label Grid.Row="1"
-                            Grid.Column="2"
-                            Grid.ColumnSpan="2"
-                            Text="{Binding lastModified}"
-                            VerticalOptions="End" />
+                                        Grid.Column="2"
+                                        Grid.ColumnSpan="2"
+                                        Text="{Binding lastModified}"
+                                        VerticalOptions="End" />
                             </Grid>
                         </SwipeView>
                     </Border>

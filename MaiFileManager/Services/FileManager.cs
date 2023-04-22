@@ -38,5 +38,6 @@ namespace MaiFileManager.Services
         public partial ObservableCollection<FileSystemInfo> GetListFile();
         public partial void UpdateDir(string newDir);
         public partial void BackDir();
+        public partial bool GetPerm();
     }
 }

@@ -3,14 +3,13 @@ using System.Diagnostics;
 using System.Linq;
 using MaiFileManager.Classes;
 using MaiFileManager.Services;
+using Org.W3c.Dom.LS;
 
 namespace MaiFileManager.Pages;
 
 public partial class HomePage : ContentPage
 {
     public FileList FileListObj { get; set; } = new FileList();
-    bool IsSelectionMode { get; set; } = false;
-    bool IsCheckedBySelect { get; set; } = false;
     bool IsAutoChecked { get; set; } = true;
     public HomePage()
     {
@@ -19,32 +18,28 @@ public partial class HomePage : ContentPage
     //check if checkbox changed as user want
     private void CheckedBySelectChange(FileSystemInfoWithIcon tmp, bool? value = null)
     {
-        IsCheckedBySelect = true;
+        FileListObj.NumberOfCheked += (tmp.CheckBoxSelected ? 0 : 1);
         tmp.CheckBoxSelected = value ?? (tmp.CheckBoxSelected ? false : true);
-        IsCheckedBySelect = false;
-        CheckAllChkValueCondition(tmp);
+        FileListObj.NumberOfCheked += (tmp.CheckBoxSelected ? 0 : -1);
     }
 
-    private void CheckAllChkValueCondition(FileSystemInfoWithIcon tmp)
+    private void CheckAllChkValueCondition()
     {
-        if (!tmp.CheckBoxSelected)
+        if (FileListObj.NumberOfCheked == FileListObj.CurrentFileList.Count)
         {
-            IsAutoChecked = false;
-            SelectAllChk.IsChecked = false;
-            IsAutoChecked = true;
-        }
-    }
-
-    private void AutoCheck(bool value)
-    {
-        if (IsAutoChecked)
-        {
-            foreach (FileSystemInfoWithIcon f in FileListObj.CurrentFileList)
+            if (SelectAllChk.IsChecked != true)
             {
-                IsCheckedBySelect = true;
-                f.CheckBoxSelected = value;
-                IsCheckedBySelect = false;
+                IsAutoChecked = false;
             }
+            SelectAllChk.IsChecked = true;
+        }
+        else
+        {
+            if (SelectAllChk.IsChecked != false)
+            {
+                IsAutoChecked = false;
+            }
+            SelectAllChk.IsChecked = false;
         }
     }
 
@@ -57,17 +52,19 @@ public partial class HomePage : ContentPage
         CancleMultipleSelection.IsVisible = value;
         SelectAllChk.IsVisible = value;
         OptionBar.IsVisible = value;
-        IsSelectionMode = value;
+        FileListObj.IsSelectionMode = value;
         BackButton.IsVisible = value ? false : (FileListObj.BackDeep > 0);
+        CheckAllChkValueCondition();
     }
 
     private void FileListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-        if (IsSelectionMode)
+        if (FileListObj.IsSelectionMode)
         {
             if (e.CurrentSelection.Count == 0) return;
             FileSystemInfoWithIcon tmp = e.CurrentSelection.FirstOrDefault() as FileSystemInfoWithIcon;
             CheckedBySelectChange(tmp);
+            CheckAllChkValueCondition();
         }
         else
         {
@@ -79,6 +76,7 @@ public partial class HomePage : ContentPage
 
     private void BackButton_Clicked(object sender, EventArgs e)
     {
+        if (FileListObj.IsSelectionMode) return;
         FileListObj.Back(sender, e);
         BackButton.IsVisible = (FileListObj.BackDeep > 0);
     }
@@ -98,25 +96,33 @@ public partial class HomePage : ContentPage
 
     private void SwipeView_SwipeStarted(object sender, SwipeStartedEventArgs e)
     {
-        (sender as SwipeView).Close();
-        if (!IsSelectionMode)
+        if (!FileListObj.IsSelectionMode)
         {
             SelecitonMode(true);
         }
+        (sender as SwipeView).Close();
     }
 
-    private void CheckBox_CheckedChanged(object sender, CheckedChangedEventArgs e)
+    private void CheckBox_Focused(object sender, FocusEventArgs e)
     {
-        if (!IsCheckedBySelect)
-        {
-            (sender as CheckBox).IsChecked = (e.Value ? false : true);
-            IsCheckedBySelect = true;
-        }
+        CheckBox tmp = sender as CheckBox;
+        tmp.IsChecked = !tmp.IsChecked;
+        tmp.Unfocus();
     }
 
     private void SelectAllChk_CheckedChanged(object sender, CheckedChangedEventArgs e)
     {
-        AutoCheck(e.Value);
+        if (IsAutoChecked)
+        {
+            foreach (FileSystemInfoWithIcon f in FileListObj.CurrentFileList)
+            {
+                CheckedBySelectChange(f, e.Value);
+            }
+        }
+        else
+        {
+            IsAutoChecked = true;
+        }
     }
 
     private void CancleMultipleSelection_Clicked(object sender, EventArgs e)
@@ -128,4 +134,30 @@ public partial class HomePage : ContentPage
         SelecitonMode(false);
     }
 
+    private void Cut_Clicked(object sender, EventArgs e)
+    {
+        FileListObj.ModifyMode(FileList.FileSelectOption.Cut);
+    }
+
+    private void Copy_Clicked(object sender, EventArgs e)
+    {
+        FileListObj.ModifyMode(FileList.FileSelectOption.Copy);
+    }
+
+    private void Paste_Clicked(object sender, EventArgs e)
+    {
+        FileListObj.PasteMode();
+    }
+
+    private async void Delete_Clicked(object sender, EventArgs e)
+    {
+        bool result = await Shell.Current.DisplayAlert("Delete File",
+                                                       "Are you sure you want to delete these file\nThis can't be undone",
+                                                       "Yes",
+                                                       "No");
+        if (result)
+        {
+            FileListObj.DeleteMode();
+        }
+    }
 }

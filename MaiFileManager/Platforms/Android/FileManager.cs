@@ -10,6 +10,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Android.Net;
+using AndroidX.Core.App;
+using MaiFileManager;
+using static Microsoft.Maui.ApplicationModel.Platform;
+using static AndroidX.Activity.Result.Contract.ActivityResultContracts;
 
 namespace MaiFileManager.Services
 {
@@ -57,6 +61,25 @@ namespace MaiFileManager.Services
             return fileList;
         }
 
+        public partial bool GetPerm()
+        {
+            if (Build.VERSION.SdkInt >= BuildVersionCodes.R)
+            {
+                if (!Android.OS.Environment.IsExternalStorageManager)
+                {
+                    Android.Content.Intent intent = new Android.Content.Intent(Android.Provider.Settings.ActionManageAppAllFilesAccessPermission);
+                    Android.Net.Uri uri = Android.Net.Uri.FromParts("package", AppInfo.PackageName, null);
+                    intent.SetData(uri);
+                    Platform.CurrentActivity.StartActivity(intent);
+                }
+                return (Android.OS.Environment.IsExternalStorageManager);
+            }
+            else
+            {
+                return false;
+            }
+        }
+
         public partial void UpdateDir(string newDir)
         {
             CurrentDir = newDir;
@@ -66,6 +89,7 @@ namespace MaiFileManager.Services
         {
             CurrentDir = Directory.GetParent(CurrentDir).FullName;
         }
+
 
         //public static partial void OpenWith(string path)
         //{
