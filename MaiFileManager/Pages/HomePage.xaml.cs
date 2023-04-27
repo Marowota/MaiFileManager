@@ -11,6 +11,7 @@ public partial class HomePage : ContentPage
 {
     public FileList FileListObj { get; set; } = new FileList();
     bool IsAutoChecked { get; set; } = true;
+    bool IsRenameMode { get; set; } = false;
     public HomePage()
     {
         InitializeComponent();
@@ -65,6 +66,10 @@ public partial class HomePage : ContentPage
             FileSystemInfoWithIcon tmp = e.CurrentSelection.FirstOrDefault() as FileSystemInfoWithIcon;
             CheckedBySelectChange(tmp);
             CheckAllChkValueCondition();
+        }
+        else if (IsRenameMode)
+        {
+            IsRenameMode = false;
         }
         else
         {
@@ -159,5 +164,23 @@ public partial class HomePage : ContentPage
         {
             FileListObj.DeleteMode();
         }
+    }
+
+    private async void Rename_SwipeStarted(object sender, SwipeStartedEventArgs e)
+    {
+        IsRenameMode = true;
+        string path = ((sender as SwipeView).RightItems.First() as SwipeItem).Text;
+        string result = await Shell.Current.DisplayPromptAsync("Rename", "Renaming:"
+                                                                       + Path.GetFileName(path)
+                                                                       + "\nType new file name:\n");
+        if (result != null)
+            FileListObj.RenameMode(path, result);
+        (sender as SwipeView).Close(false);
+    }
+
+    private void RefreshView_Refreshing(object sender, EventArgs e)
+    {
+        FileListObj.UpdateFileList();
+        (sender as RefreshView).IsRefreshing = false;
     }
 }

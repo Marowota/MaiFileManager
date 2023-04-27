@@ -95,81 +95,96 @@
                         Clicked="Delete_Clicked"/>
             </Grid>
         </Border>
-        <CollectionView x:Name="FileListView"
-                        Grid.Row="1"
-                        BindingContext="{x:Reference homePage}"
-                        ItemsSource="{Binding FileListObj.CurrentFileList}"
-                        SelectionChanged="FileListView_SelectionChanged"
-                        SelectionMode="Single"
-                        HorizontalScrollBarVisibility="Default"
-                        EmptyView="No File or Folder found">
-            <CollectionView.ItemTemplate>
-                <DataTemplate>
-                    <Border 
-                        StrokeThickness="1"
-                        StrokeShape="RoundRectangle 5,5,5,5"
-                        Background="Transparent"
-                        Padding="12,8"
-                        Margin="0,1">
-                        <SwipeView SwipeStarted="SwipeView_SwipeStarted"
-                                   FlowDirection="LeftToRight">
-                            <SwipeView.LeftItems>
-                                <SwipeItems SwipeBehaviorOnInvoked="Close">
-                                    <SwipeItemView>
-                                        <StackLayout WidthRequest="5">
-                                        </StackLayout>
-                                    </SwipeItemView>
-                                </SwipeItems>
-                            </SwipeView.LeftItems>
-                            <Grid Padding="10, 10">
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="Auto" />
-                                    <RowDefinition Height="Auto" />
-                                </Grid.RowDefinitions>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto"/>
-                                    <ColumnDefinition Width="{Binding iconSize}" />
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="60" />
-                                </Grid.ColumnDefinitions>
-                                <CheckBox Grid.Column="0"
-                                          Grid.RowSpan="2"
-                                          Focused="CheckBox_Focused"
-                                          HeightRequest="30"
-                                          IsVisible="{Binding CheckBoxSelectVisible}"
-                                          IsChecked="{Binding CheckBoxSelected}"
-                                          IsEnabled="False">
-                                    <CheckBox.Style>
-                                        <Style TargetType="CheckBox">
-                                            <Style.Triggers>
-                                                <Trigger TargetType="CheckBox" Property="IsEnabled" Value="False">
-                                                    <Setter Property="Color" Value="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource White}}" />
-                                                </Trigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </CheckBox.Style>
-                                </CheckBox>
-                                <Image Source="{Binding iconPath}" 
-                                       Grid.Column="1"
-                                       Grid.RowSpan="2"
-                                       Margin="0,0,10,0"/>
-                                <Label Grid.Column="2"
+        <SwipeView SwipeStarted="SwipeView_SwipeStarted"
+                   FlowDirection="LeftToRight"
+                        Grid.Row="1">
+            <SwipeView.LeftItems>
+                <SwipeItems SwipeBehaviorOnInvoked="Close">
+                    <SwipeItemView>
+                        <StackLayout WidthRequest="5">
+                        </StackLayout>
+                    </SwipeItemView>
+                </SwipeItems>
+            </SwipeView.LeftItems>
+            <RefreshView Refreshing="RefreshView_Refreshing">
+                <CollectionView x:Name="FileListView"
+                            BindingContext="{x:Reference homePage}"
+                            ItemsSource="{Binding FileListObj.CurrentFileList}"
+                            SelectionChanged="FileListView_SelectionChanged"
+                            SelectionMode="Single"
+                            HorizontalScrollBarVisibility="Default"
+                            EmptyView="No File or Folder found">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate>
+                            <Border 
+                                    StrokeThickness="1"
+                                    StrokeShape="RoundRectangle 5,5,5,5"
+                                    Background="Transparent"
+                                    Padding="12,8"
+                                    Margin="0,1">
+                                <SwipeView SwipeStarted="Rename_SwipeStarted"
+                                           Grid.Row="1">
+                                    <SwipeView.RightItems>
+                                        <SwipeItems SwipeBehaviorOnInvoked="Close">
+                                            <SwipeItem  Text="{Binding fileInfo.FullName}"
+                                                        IsVisible="False"/>
+                                            <SwipeItemView>
+                                                <StackLayout WidthRequest="1">
+                                                </StackLayout>
+                                            </SwipeItemView>
+                                        </SwipeItems>
+                                    </SwipeView.RightItems>
+                                    <Grid Padding="10, 10">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                        </Grid.RowDefinitions>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="{Binding iconSize}" />
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="60" />
+                                        </Grid.ColumnDefinitions>
+                                        <CheckBox Grid.Column="0"
+                                            Grid.RowSpan="2"
+                                            Focused="CheckBox_Focused"
+                                            HeightRequest="30"
+                                            IsVisible="{Binding CheckBoxSelectVisible}"
+                                            IsChecked="{Binding CheckBoxSelected}"
+                                            IsEnabled="False">
+                                            <CheckBox.Style>
+                                                <Style TargetType="CheckBox">
+                                                    <Style.Triggers>
+                                                        <Trigger TargetType="CheckBox" Property="IsEnabled" Value="False">
+                                                            <Setter Property="Color" Value="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource White}}" />
+                                                        </Trigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </CheckBox.Style>
+                                        </CheckBox>
+                                        <Image Source="{Binding iconPath}" 
+                                        Grid.Column="1"
+                                        Grid.RowSpan="2"
+                                        Margin="0,0,10,0"/>
+                                        <Label Grid.Column="2"
                                         Text="{Binding fileInfo.Name}"
                                         FontAttributes="Bold" />
-                                <Label Grid.Column="3"
+                                        <Label Grid.Column="3"
                                         Text="{Binding fileInfoSize}"
                                         FontAttributes="Bold" 
-                                        HorizontalOptions="EndAndExpand"/>      
-                                <Label Grid.Row="1"
+                                        HorizontalOptions="EndAndExpand"/>
+                                        <Label Grid.Row="1"
                                         Grid.Column="2"
                                         Grid.ColumnSpan="2"
                                         Text="{Binding lastModified}"
                                         VerticalOptions="End" />
-                            </Grid>
-                        </SwipeView>
-                    </Border>
-                </DataTemplate>
-            </CollectionView.ItemTemplate>
-        </CollectionView>
+                                    </Grid>
+                                </SwipeView>
+                            </Border>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </RefreshView>
+        </SwipeView>
     </Grid>
 </ContentPage>
