@@ -16,11 +16,17 @@ public partial class HomePage : ContentPage
     {
         FileListObj = new FileList();
         InitializeComponent();
+        InitialLoad();
     }
     public HomePage(int param)
     {
         FileListObj = new FileList(param);
         InitializeComponent();
+        InitialLoad();
+    }
+    private async void InitialLoad()
+    {
+        await FileListObj.InitialLoadAsync();
     }
     //check if checkbox changed as user want
     private void CheckedBySelectChange(FileSystemInfoWithIcon tmp, bool? value = null)
@@ -64,7 +70,7 @@ public partial class HomePage : ContentPage
         CheckAllChkValueCondition();
     }
 
-    private void FileListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    private async void FileListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         if (FileListObj.IsSelectionMode)
         {
@@ -79,16 +85,16 @@ public partial class HomePage : ContentPage
         }
         else
         {
-            FileListObj.PathSelection(sender, e);
+            await FileListObj.PathSelectionAsync(sender, e);
             BackButton.IsVisible = (FileListObj.BackDeep > 0);
         }
         (sender as CollectionView).SelectedItem = null;
     }
 
-    private void BackButton_Clicked(object sender, EventArgs e)
+    private async void BackButton_Clicked(object sender, EventArgs e)
     {
         if (FileListObj.IsSelectionMode) return;
-        FileListObj.Back(sender, e);
+        await FileListObj.BackAsync(sender, e);
         BackButton.IsVisible = (FileListObj.BackDeep > 0);
     }
 
@@ -155,9 +161,9 @@ public partial class HomePage : ContentPage
         FileListObj.ModifyMode(FileList.FileSelectOption.Copy);
     }
 
-    private void Paste_Clicked(object sender, EventArgs e)
+    private async void Paste_Clicked(object sender, EventArgs e)
     {
-        FileListObj.PasteMode();
+        await FileListObj.PasteModeAsync();
     }
 
     private async void Delete_Clicked(object sender, EventArgs e)
@@ -168,7 +174,7 @@ public partial class HomePage : ContentPage
                                                        "No");
         if (result)
         {
-            FileListObj.DeleteMode();
+            await FileListObj.DeleteModeAsync();
         }
     }
 
@@ -179,19 +185,30 @@ public partial class HomePage : ContentPage
         string result = await Shell.Current.DisplayPromptAsync("Rename", "Renaming:"
                                                                        + Path.GetFileName(path)
                                                                        + "\nType new file name:\n");
+        while (result == "")
+        {
+            await Shell.Current.DisplayAlert("Invalid", "Please type a name", "OK");
+            result = await Shell.Current.DisplayPromptAsync("Rename", "Renaming:"
+                                                                    + Path.GetFileName(path)
+                                                                    + "\nType new file name:\n");
+        }
         if (result != null)
-            FileListObj.RenameMode(path, result);
+        {
+            await FileListObj.RenameModeAsync(path, result);
+        }    
         (sender as SwipeView).Close(false);
     }
 
-    private void RefreshView_Refreshing(object sender, EventArgs e)
+    private async void RefreshView_Refreshing(object sender, EventArgs e)
     {
-        FileListObj.UpdateFileList();
+        SwipeFileBox.IsVisible = false;
+        await Task.Run(FileListObj.UpdateFileListAsync);
+        SwipeFileBox.IsVisible = true;
         (sender as RefreshView).IsRefreshing = false;
     }
 
-    private void homePage_Appearing(object sender, EventArgs e)
+    private async void homePage_Appearing(object sender, EventArgs e)
     {
-        FileListObj.UpdateFileList();
+        await Task.Run(FileListObj.UpdateFileListAsync);
     }
 }

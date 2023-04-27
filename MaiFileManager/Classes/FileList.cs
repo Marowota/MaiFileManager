@@ -1,12 +1,14 @@
 ﻿using MaiFileManager.Services;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 
 namespace MaiFileManager.Classes
 {
     /// <summary>
     /// Class help the UI get the information to view the list of files
     /// </summary>
-    public class FileList
+    public class FileList : INotifyPropertyChanged
     {
         public enum FileSelectOption
         {
@@ -14,6 +16,9 @@ namespace MaiFileManager.Classes
             Cut, 
             Copy,
         }
+        
+        public event PropertyChangedEventHandler PropertyChanged;
+
         public ObservableCollection<FileSystemInfoWithIcon> CurrentFileList { get; set; } = new ObservableCollection<FileSystemInfoWithIcon>();
         public FileManager CurrentDirectoryInfo { get; set; }
         public int BackDeep {get; set;} = 0;
@@ -21,21 +26,42 @@ namespace MaiFileManager.Classes
         public ObservableCollection<FileSystemInfoWithIcon> OperatedFileList { get; set; } = new ObservableCollection<FileSystemInfoWithIcon>();
         public bool IsSelectionMode { get; set; } = false;
         public int NumberOfCheked { get; set; } = 0;
+        private bool isReloading = true;
+        public bool IsReloading
+        {
+            get
+            {
+                return isReloading;
+            }
+            set
+            {
+                isReloading = value;
+                OnPropertyChanged(nameof(IsReloading));
+                OnPropertyChanged(nameof(IsNotReloading));
+            }
+        }
+        public bool IsNotReloading
+        {
+            get 
+            { 
+                return !isReloading; 
+            }
+        }
         public FileList()
         {
-            CurrentDirectoryInfo = new FileManager(); 
-            InitialLoad();
+            CurrentDirectoryInfo = new FileManager();
         }
         public FileList(int type)
         {
             CurrentDirectoryInfo = new FileManager(type);
-            InitialLoad();
         }
         public FileList(string path)
         {
             CurrentDirectoryInfo = new FileManager(path); 
-            InitialLoad();
         }
+
+        public void OnPropertyChanged([CallerMemberName] string name = "") =>
+             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
 
 
         #region Permission
@@ -55,7 +81,7 @@ namespace MaiFileManager.Classes
         }
         #endregion
 
-        private async void InitialLoad()
+        internal async Task InitialLoadAsync()
         {
             bool accepted = await RequestPermAsync();
             if (!accepted)
@@ -63,7 +89,7 @@ namespace MaiFileManager.Classes
                 await Shell.Current.DisplayAlert("Permission not granted", "Need storage permission to use the app", "OK");
                 Application.Current.Quit();
             }
-            UpdateFileList();
+            //await Task.Run(UpdateFileListAsync);
         }
 
         private void UpdateBackDeep(int val)
@@ -75,31 +101,40 @@ namespace MaiFileManager.Classes
             }
         }
 
-        internal void UpdateFileList()
+        internal async Task UpdateFileListAsync()
         {
-            CurrentFileList.Clear();
-            foreach (FileSystemInfo info in CurrentDirectoryInfo.GetListFile())
+            IsReloading = true;
+            await Task.Run(async () =>
             {
-                if (info.GetType() == typeof(FileInfo))
+                CurrentFileList.Clear();
+                foreach (FileSystemInfo info in CurrentDirectoryInfo.GetListFile())
                 {
-                    CurrentFileList.Add(new FileSystemInfoWithIcon(info, MaiIcon.GetIcon(info.Extension), 40));
+                    await Task.Run(() =>
+                    {
+                        if (info.GetType() == typeof(FileInfo))
+                        {
+                            CurrentFileList.Add(new FileSystemInfoWithIcon(info, MaiIcon.GetIcon(info.Extension), 40));
+                        }
+                        else if (info.GetType() == typeof(DirectoryInfo))
+                        {
+                            CurrentFileList.Add(new FileSystemInfoWithIcon(info, "folder.png", 45));
+                        }
+
+                    });
                 }
-                else if (info.GetType() == typeof(DirectoryInfo))
+                if (IsSelectionMode)
                 {
-                    CurrentFileList.Add(new FileSystemInfoWithIcon(info, "folder.png", 45));
+                    foreach (FileSystemInfoWithIcon f in CurrentFileList)
+                    {
+                        f.CheckBoxSelectVisible = true;
+                    }
                 }
-            }
-            if (IsSelectionMode)
-            {
-                foreach (FileSystemInfoWithIcon f in CurrentFileList)
-                {
-                    f.CheckBoxSelectVisible = true;
-                }
-            }
-            NumberOfCheked = 0;
+                NumberOfCheked = 0;
+            });
+            IsReloading = false;
         }
 
-        internal async void PathSelection(object sender, SelectionChangedEventArgs e)
+        internal async Task PathSelectionAsync(object sender, SelectionChangedEventArgs e)
         {
             if (sender is null) return;
             if (e.CurrentSelection.Count == 0) return;
@@ -115,15 +150,15 @@ namespace MaiFileManager.Classes
                 if (selected == null)
                     return;
                 CurrentDirectoryInfo.UpdateDir(selected.FullName);
-                UpdateFileList();
+                await Task.Run(UpdateFileListAsync);
                 UpdateBackDeep(1);
             }
         }
 
-        internal void Back(object sender, EventArgs e)
+        internal async Task BackAsync(object sender, EventArgs e)
         {
             CurrentDirectoryInfo.BackDir();
-            UpdateFileList();
+            await UpdateFileListAsync();
             UpdateBackDeep(-1);
         }
         async void CopyDirectory(DirectoryInfo sourceDir, string destinationPath)
@@ -144,7 +179,7 @@ namespace MaiFileManager.Classes
             foreach (FileInfo file in sourceDir.GetFiles())
             {
                 string targetFilePath = Path.Combine(newSourcePath, file.Name);
-                if (await IsExistedFile(targetFilePath, file.Name))
+                if (await IsExistedFileAsync(targetFilePath, file.Name))
                 {
                     int num = 0;
                     while (File.Exists(string.Format("{0}{1}",targetFilePath,num)))
@@ -177,7 +212,7 @@ namespace MaiFileManager.Classes
             }
             return false;
         }  
-        async Task<bool> IsExistedFile(string dir, string dirName)
+        async Task<bool> IsExistedFileAsync(string dir, string dirName)
         {
             bool result = false;
             if (File.Exists(dir))
@@ -203,7 +238,7 @@ namespace MaiFileManager.Classes
             }
         }
 
-        internal void DeleteMode()
+        internal async Task DeleteModeAsync()
         {
             foreach (FileSystemInfoWithIcon f in CurrentFileList)
             {
@@ -212,17 +247,17 @@ namespace MaiFileManager.Classes
                     f.fileInfo.Delete();
                 }
             }
-            UpdateFileList();
+            await UpdateFileListAsync();
             OperatedFileList.Clear();
         }
-        internal void RenameMode(string path, string newName)
+        internal async Task RenameModeAsync(string path, string newName)
         {
             if (Directory.Exists(path))
             {
                 string newPath = Path.Combine(Directory.GetParent(path).FullName, newName);
                 if (Directory.Exists(newPath))
                 {
-                    Shell.Current.DisplayAlert("Duplicated", "Duplicate folder name, please choose another name", "OK");
+                    await Shell.Current.DisplayAlert("Duplicated", "Duplicate folder name, please choose another name", "OK");
                     return;
                 }
                 Directory.Move(path, newPath);
@@ -232,16 +267,16 @@ namespace MaiFileManager.Classes
                 string newPath = Path.Combine(Directory.GetParent(path).FullName, newName) + Path.GetExtension(path);
                 if (File.Exists(newPath))
                 {
-                    Shell.Current.DisplayAlert("Duplicated", "Duplicate file name, please choose another name", "OK");
+                    await Shell.Current.DisplayAlert("Duplicated", "Duplicate file name, please choose another name", "OK");
                     return;
                 }
 
                 File.Move(path, newPath);
             }
-            UpdateFileList();
+            await UpdateFileListAsync();
         }
 
-        internal async void PasteMode()
+        internal async Task PasteModeAsync()
         {
             foreach (FileSystemInfoWithIcon f in OperatedFileList)
             {
@@ -252,7 +287,7 @@ namespace MaiFileManager.Classes
                             if (f.fileInfo.GetType() == typeof(FileInfo))
                             {
                                 string targetFilePath = Path.Combine(CurrentDirectoryInfo.CurrentDir, f.fileInfo.Name);
-                                if (await IsExistedFile(targetFilePath, f.fileInfo.Name))
+                                if (await IsExistedFileAsync(targetFilePath, f.fileInfo.Name))
                                 {
                                     int num = 0;
                                     while (File.Exists(string.Format("{0}{1}", targetFilePath, num)))
@@ -290,7 +325,7 @@ namespace MaiFileManager.Classes
                             if (f.fileInfo.GetType() == typeof(FileInfo))
                             {
                                 string targetFilePath = Path.Combine(CurrentDirectoryInfo.CurrentDir, f.fileInfo.Name);
-                                if (await IsExistedFile(targetFilePath, f.fileInfo.Name))
+                                if (await IsExistedFileAsync(targetFilePath, f.fileInfo.Name))
                                 {
                                     int num = 0;
                                     while (File.Exists(string.Format("{0}{1}", targetFilePath, num)))
@@ -314,7 +349,7 @@ namespace MaiFileManager.Classes
                         }
                 }
             }
-            UpdateFileList();
+            await UpdateFileListAsync();
         }
     }
 }

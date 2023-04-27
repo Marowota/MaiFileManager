@@ -96,9 +96,19 @@
                         Clicked="Delete_Clicked"/>
             </Grid>
         </Border>
-        <SwipeView SwipeStarted="SwipeView_SwipeStarted"
-                   FlowDirection="LeftToRight"
-                        Grid.Row="1">
+        <ActivityIndicator x:Name="LoadingFile" 
+                           Grid.Row="1"
+                           BindingContext="{x:Reference homePage}"
+                           IsRunning="{Binding FileListObj.IsReloading}"
+                           HeightRequest="50"
+                           WidthRequest="50"/>
+        <RefreshView Refreshing="RefreshView_Refreshing"
+                     Grid.Row="1">
+            <SwipeView SwipeStarted="SwipeView_SwipeStarted"
+                       FlowDirection="LeftToRight"
+                       x:Name="SwipeFileBox"
+                        BindingContext="{x:Reference homePage}"
+                        IsVisible="{Binding FileListObj.IsNotReloading}">
             <SwipeView.LeftItems>
                 <SwipeItems SwipeBehaviorOnInvoked="Close">
                     <SwipeItemView>
@@ -107,7 +117,6 @@
                     </SwipeItemView>
                 </SwipeItems>
             </SwipeView.LeftItems>
-            <RefreshView Refreshing="RefreshView_Refreshing">
                 <CollectionView x:Name="FileListView"
                             BindingContext="{x:Reference homePage}"
                             ItemsSource="{Binding FileListObj.CurrentFileList}"
@@ -185,7 +194,7 @@
                         </DataTemplate>
                     </CollectionView.ItemTemplate>
                 </CollectionView>
-            </RefreshView>
-        </SwipeView>
+            </SwipeView>
+        </RefreshView>
     </Grid>
 </ContentPage>
