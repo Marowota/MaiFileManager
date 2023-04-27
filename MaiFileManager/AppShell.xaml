@@ -13,8 +13,16 @@
                       Title="Favourite"
                       ContentTemplate="{DataTemplate pages:Favourite}"/>
         <ShellContent Icon="download.png"
-                      Title="Downloaded"
-                      ContentTemplate="{DataTemplate pages:Downloaded}"/>
-
+                      Title="Downloaded">
+            <ShellContent.ContentTemplate>
+                <DataTemplate>
+                    <pages:HomePage>
+                        <x:Arguments>
+                            <x:Int32>1</x:Int32>
+                        </x:Arguments>
+                    </pages:HomePage>
+                </DataTemplate>
+            </ShellContent.ContentTemplate>
+        </ShellContent>
     </TabBar>
 </Shell>

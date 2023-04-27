@@ -31,6 +31,9 @@ namespace MaiFileManager.Services
         {
             switch (type)
             {
+                case 0:
+                    currentDir = global::Android.OS.Environment.ExternalStorageDirectory.Path;
+                    break;
                 case 1:
                     currentDir = Android.OS.Environment.GetExternalStoragePublicDirectory(Android.OS.Environment.DirectoryDownloads).AbsolutePath;
                     break;

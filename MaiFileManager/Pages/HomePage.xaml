@@ -5,7 +5,8 @@
              xmlns:classes="clr-namespace:MaiFileManager.Classes"
              x:Class="MaiFileManager.Pages.HomePage"
              x:Name="homePage"
-             Title="HomePage">
+             Title="HomePage"
+             Appearing="homePage_Appearing">
     <Shell.TitleView>
         <Grid>
             <Grid.ColumnDefinitions>

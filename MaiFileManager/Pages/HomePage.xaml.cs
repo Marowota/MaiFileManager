@@ -9,11 +9,17 @@ namespace MaiFileManager.Pages;
 
 public partial class HomePage : ContentPage
 {
-    public FileList FileListObj { get; set; } = new FileList();
+    public FileList FileListObj { get; set; }
     bool IsAutoChecked { get; set; } = true;
     bool IsRenameMode { get; set; } = false;
     public HomePage()
     {
+        FileListObj = new FileList();
+        InitializeComponent();
+    }
+    public HomePage(int param)
+    {
+        FileListObj = new FileList(param);
         InitializeComponent();
     }
     //check if checkbox changed as user want
@@ -182,5 +188,10 @@ public partial class HomePage : ContentPage
     {
         FileListObj.UpdateFileList();
         (sender as RefreshView).IsRefreshing = false;
+    }
+
+    private void homePage_Appearing(object sender, EventArgs e)
+    {
+        FileListObj.UpdateFileList();
     }
 }
