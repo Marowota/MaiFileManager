@@ -157,9 +157,9 @@ namespace MaiFileManager.Classes
 
         internal async Task BackAsync(object sender, EventArgs e)
         {
+            UpdateBackDeep(-1);
             CurrentDirectoryInfo.BackDir();
             await UpdateFileListAsync();
-            UpdateBackDeep(-1);
         }
         async void CopyDirectory(DirectoryInfo sourceDir, string destinationPath)
         {

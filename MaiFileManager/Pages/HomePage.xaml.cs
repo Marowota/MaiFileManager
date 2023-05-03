@@ -94,6 +94,7 @@ public partial class HomePage : ContentPage
     private async void BackButton_Clicked(object sender, EventArgs e)
     {
         if (FileListObj.IsSelectionMode) return;
+        if (FileListObj.BackDeep == 0) return;
         await FileListObj.BackAsync(sender, e);
         BackButton.IsVisible = (FileListObj.BackDeep > 0);
     }
