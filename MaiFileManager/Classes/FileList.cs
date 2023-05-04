@@ -89,6 +89,10 @@ namespace MaiFileManager.Classes
                 await Shell.Current.DisplayAlert("Permission not granted", "Need storage permission to use the app", "OK");
                 Application.Current.Quit();
             }
+            else
+            {
+                await Task.Run(UpdateFileListAsync);
+            }    
             //await Task.Run(UpdateFileListAsync);
         }
 
@@ -275,7 +279,6 @@ namespace MaiFileManager.Classes
             }
             await UpdateFileListAsync();
         }
-
         internal async Task PasteModeAsync()
         {
             foreach (FileSystemInfoWithIcon f in OperatedFileList)
@@ -351,5 +354,18 @@ namespace MaiFileManager.Classes
             }
             await UpdateFileListAsync();
         }
+        internal async Task<bool> NewFolderAsync(string name)
+        {
+            string path = Path.Combine(CurrentDirectoryInfo.CurrentDir, name);
+            if (Directory.Exists(path))
+            {
+                await Shell.Current.DisplayAlert("Duplicated", "Duplicate folder name, please choose another name", "OK");
+                return false; 
+            }
+            Directory.CreateDirectory(path);
+            await UpdateFileListAsync();
+            return true;
+        }
+
     }
 }

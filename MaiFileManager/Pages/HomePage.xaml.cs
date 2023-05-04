@@ -12,6 +12,7 @@ public partial class HomePage : ContentPage
     public FileList FileListObj { get; set; }
     bool IsAutoChecked { get; set; } = true;
     bool IsRenameMode { get; set; } = false;
+    bool FirstLoad = true;
     public HomePage()
     {
         FileListObj = new FileList();
@@ -101,7 +102,11 @@ public partial class HomePage : ContentPage
 
     protected override bool OnBackButtonPressed()
     {
-        if (FileListObj.BackDeep > 0)
+        if (FileListObj.IsSelectionMode)
+        {
+            CancleMultipleSelection_Clicked(null, null);
+        }
+        else if (FileListObj.BackDeep > 0)
         {
             BackButton_Clicked(BackButton, EventArgs.Empty);
         }
@@ -210,6 +215,37 @@ public partial class HomePage : ContentPage
 
     private async void homePage_Appearing(object sender, EventArgs e)
     {
-        await Task.Run(FileListObj.UpdateFileListAsync);
+        if (!FirstLoad)
+        {
+            await Task.Run(FileListObj.UpdateFileListAsync);
+        }
+        FirstLoad = false;
+    }
+
+    private void SearchFileFolder_Clicked(object sender, EventArgs e)
+    {
+
+    }
+
+    private async void AddNewFolder_Clicked(object sender, EventArgs e)
+    {
+        bool success = false;
+        do
+        {
+            string result = await Shell.Current.DisplayPromptAsync("New Folder", "Folder name: \n");
+            while (result == "")
+            {
+                await Shell.Current.DisplayAlert("Invalid", "Please type a name", "OK");
+                result = await Shell.Current.DisplayPromptAsync("New Folder", "Folder name: \n");
+            }
+            if (result != null)
+            {
+                success = await FileListObj.NewFolderAsync(result);
+            }
+            else
+            {
+                return;
+            }
+        } while (!success);
     }
 }

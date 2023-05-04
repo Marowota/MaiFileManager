@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:local="clr-namespace:MaiFileManager.Pages"
              xmlns:classes="clr-namespace:MaiFileManager.Classes"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              x:Class="MaiFileManager.Pages.HomePage"
              x:Name="homePage"
              Title="HomePage"
@@ -12,10 +13,12 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="30"/>
-                <ColumnDefinition Width="30"/>
+                <ColumnDefinition Width="10"/>
+                <ColumnDefinition Width="40"/>
+                <ColumnDefinition Width="auto"/>
                 <ColumnDefinition Width="10"/>
             </Grid.ColumnDefinitions>
-            <HorizontalStackLayout>
+            <HorizontalStackLayout >
                 <ImageButton x:Name="BackButton"
                     Source="back.png"
                     Clicked="BackButton_Clicked"
@@ -35,8 +38,22 @@
                    FontAttributes="Bold"
                    FontSize="Title"/>
             </HorizontalStackLayout>
+            <ImageButton x:Name="SearchFileFolder"
+                         Grid.Column="1"
+                         HorizontalOptions="CenterAndExpand"
+                         VerticalOptions="CenterAndExpand"
+                         Source="searchfile.png"
+                         Clicked="SearchFileFolder_Clicked"/>
+            <ImageButton x:Name="AddNewFolder"
+                         Grid.Column="3"
+                         HorizontalOptions="CenterAndExpand"
+                         VerticalOptions="CenterAndExpand"
+                         Source="newfolder.png"
+                         Clicked="AddNewFolder_Clicked"/>
             <ImageButton x:Name="CancleMultipleSelection"
-                         Grid.Column="2"
+                         Grid.Column="4"
+                         WidthRequest="30"
+                         Margin="10,0,0,0"
                          HorizontalOptions="CenterAndExpand"
                          VerticalOptions="CenterAndExpand"
                          Source="cancel.png"
@@ -71,6 +88,13 @@
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
+                <Grid.Resources>
+                    <Style TargetType="Button">
+                        <Setter Property="BackgroundColor" Value="Transparent"/>
+                        <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Black}, Dark={StaticResource White}}"/>
+                    </Style>
+                    
+                </Grid.Resources>
                 <CheckBox x:Name="SelectAllChk"
                           Grid.Column="0"
                           HorizontalOptions="Start"
@@ -79,21 +103,29 @@
                           HeightRequest="50"
                           CheckedChanged="SelectAllChk_CheckedChanged"/>
                 <Button x:Name="Cut"
-                        Text="Cut"
-                        Grid.Column="1"
-                        Clicked="Cut_Clicked"/>
+                                Text="Move"
+                                ImageSource="{AppThemeBinding Light=move.png, Dark=darkmove.png}"
+                                ContentLayout="Top, 0"
+                                Grid.Column="1"
+                                Clicked="Cut_Clicked"/>
                 <Button x:Name="Copy"
-                        Text="Copy"
-                        Grid.Column="2"
-                        Clicked="Copy_Clicked"/>
+                                Text="Copy"
+                                ImageSource="{AppThemeBinding Light=copy.png, Dark=darkcopy.png}"
+                                ContentLayout="Top, 0"
+                                Grid.Column="2"
+                                Clicked="Copy_Clicked"/>
                 <Button x:Name="Paste"
-                        Text="Paste"
-                        Grid.Column="3"
-                        Clicked="Paste_Clicked"/>
+                                Text="Paste"
+                                ImageSource="{AppThemeBinding Light=paste.png, Dark=darkpaste.png}"
+                                ContentLayout="Top, 0"
+                                Grid.Column="3"
+                                Clicked="Paste_Clicked"/>
                 <Button x:Name="Delete"
-                        Text="Delete"
-                        Grid.Column="4"
-                        Clicked="Delete_Clicked"/>
+                                Text="Delete"
+                                ImageSource="{AppThemeBinding Light=delete.png, Dark=darkdelete.png}"
+                                ContentLayout="Top, 0"
+                                Grid.Column="4"
+                                Clicked="Delete_Clicked"/>
             </Grid>
         </Border>
         <ActivityIndicator x:Name="LoadingFile" 

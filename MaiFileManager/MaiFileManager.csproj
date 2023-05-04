@@ -49,13 +49,25 @@
 	<ItemGroup>
 	  <None Remove="Resources\Images\back.png" />
 	  <None Remove="Resources\Images\cancel.png" />
+	  <None Remove="Resources\Images\copy.png" />
+	  <None Remove="Resources\Images\darkcopy.png" />
+	  <None Remove="Resources\Images\darkdelete.png" />
+	  <None Remove="Resources\Images\darkmove.png" />
+	  <None Remove="Resources\Images\darkpaste.png" />
+	  <None Remove="Resources\Images\delete.png" />
 	  <None Remove="Resources\Images\download.png" />
 	  <None Remove="Resources\Images\folder.png" />
 	  <None Remove="Resources\Images\heart.png" />
+	  <None Remove="Resources\Images\love.png" />
+	  <None Remove="Resources\Images\move.png" />
+	  <None Remove="Resources\Images\newfolder.png" />
+	  <None Remove="Resources\Images\paste.png" />
+	  <None Remove="Resources\Images\searchfile.png" />
 	  <None Remove="Resources\Images\sfolder.png" />
 	</ItemGroup>
 
 	<ItemGroup>
+		<PackageReference Include="CommunityToolkit.Maui" Version="5.1.0" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="7.0.0" />
 	</ItemGroup>
 
