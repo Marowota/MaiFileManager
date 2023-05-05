@@ -194,20 +194,19 @@ namespace MaiFileManager.Classes
             foreach (FileInfo file in sourceDir.GetFiles())
             {
                 string targetFilePath = Path.Combine(newSourcePath, file.Name);
-                if (await IsExistedFileAsync(targetFilePath, file.Name))
+                if (File.Exists(targetFilePath))
                 {
-                    int num = 0;
-                    while (File.Exists(string.Format("{0}{1}",targetFilePath,num)))
+                    if (await ArletForExisted(targetFilePath, file.Name))
                     {
-                        num++;
+                        int num = 0;
+                        while (File.Exists(string.Format("{0}{1}", targetFilePath, num)))
+                        {
+                            num++;
+                        }
+                        file.CopyTo(string.Format("{0}{1}", targetFilePath, num));
+                        File.Delete(targetFilePath);
+                        File.Move(string.Format("{0}{1}", targetFilePath, num), targetFilePath);
                     }
-                    file.CopyTo(string.Format("{0}{1}", targetFilePath, num));
-                    File.Delete(targetFilePath);
-                    File.Move(string.Format("{0}{1}", targetFilePath, num), targetFilePath);
-                }
-                else
-                {
-                    file.CopyTo(targetFilePath);
                 }
             }
 
@@ -227,7 +226,7 @@ namespace MaiFileManager.Classes
             }
             return false;
         }  
-        async Task<bool> IsExistedFileAsync(string dir, string dirName)
+        async Task<bool> ArletForExisted(string dir, string dirName)
         {
             bool result = false;
             if (File.Exists(dir))
@@ -259,7 +258,14 @@ namespace MaiFileManager.Classes
             {
                 if (f.CheckBoxSelected)
                 {
-                    f.fileInfo.Delete();
+                    if (f.fileInfo.GetType() == typeof(FileInfo))
+                    {
+                        (f.fileInfo as FileInfo).Delete();
+                    }
+                    else if (f.fileInfo.GetType() == typeof(DirectoryInfo))
+                    {
+                        (f.fileInfo as DirectoryInfo).Delete(true);
+                    }
                 }
             }
             await UpdateFileListAsync();
@@ -301,16 +307,19 @@ namespace MaiFileManager.Classes
                             if (f.fileInfo.GetType() == typeof(FileInfo))
                             {
                                 string targetFilePath = Path.Combine(CurrentDirectoryInfo.CurrentDir, f.fileInfo.Name);
-                                if (await IsExistedFileAsync(targetFilePath, f.fileInfo.Name))
+                                if (File.Exists(targetFilePath))
                                 {
-                                    int num = 0;
-                                    while (File.Exists(string.Format("{0}{1}", targetFilePath, num)))
+                                    if (await ArletForExisted(targetFilePath, f.fileInfo.Name))
                                     {
-                                        num++;
-                                    }
+                                        int num = 0;
+                                        while (File.Exists(string.Format("{0}{1}", targetFilePath, num)))
+                                        {
+                                            num++;
+                                        }
                                     (f.fileInfo as FileInfo).MoveTo(string.Format("{0}{1}", targetFilePath, num));
-                                    File.Delete(targetFilePath);
-                                    File.Move(string.Format("{0}{1}", targetFilePath, num), targetFilePath);
+                                        File.Delete(targetFilePath);
+                                        File.Move(string.Format("{0}{1}", targetFilePath, num), targetFilePath);
+                                    }
                                 }
                                 else
                                 {
@@ -339,25 +348,37 @@ namespace MaiFileManager.Classes
                             if (f.fileInfo.GetType() == typeof(FileInfo))
                             {
                                 string targetFilePath = Path.Combine(CurrentDirectoryInfo.CurrentDir, f.fileInfo.Name);
-                                if (await IsExistedFileAsync(targetFilePath, f.fileInfo.Name))
+                                if (File.Exists(targetFilePath))
                                 {
-                                    int num = 0;
-                                    while (File.Exists(string.Format("{0}{1}", targetFilePath, num)))
+                                    if (await ArletForExisted(targetFilePath, f.fileInfo.Name))
                                     {
-                                        num++;
-                                    }
+                                        int num = 0;
+                                        while (File.Exists(string.Format("{0}{1}", targetFilePath, num)))
+                                        {
+                                            num++;
+                                        }
                                     (f.fileInfo as FileInfo).CopyTo(string.Format("{0}{1}", targetFilePath, num));
-                                    File.Delete(targetFilePath);
-                                    File.Move(string.Format("{0}{1}", targetFilePath, num), targetFilePath);
+                                        File.Delete(targetFilePath);
+                                        File.Move(string.Format("{0}{1}", targetFilePath, num), targetFilePath);
+                                    }
                                 }
                                 else
-                                { 
+                                {
                                     (f.fileInfo as FileInfo).CopyTo(targetFilePath);
                                 }
+
                             }
                             else if (f.fileInfo.GetType() == typeof(DirectoryInfo))
                             {
-                                CopyDirectory((f.fileInfo as DirectoryInfo), CurrentDirectoryInfo.CurrentDir);
+                                if (IsDirectoryContainDirectory(f.fileInfo.FullName, CurrentDirectoryInfo.CurrentDir))
+                                {
+                                    await Shell.Current.DisplayAlert("Error", f.fileInfo.Name + "\nCannot cut to itself", "OK");
+                                    continue;
+                                }
+                                else
+                                {
+                                    CopyDirectory((f.fileInfo as DirectoryInfo), CurrentDirectoryInfo.CurrentDir);
+                                }
                             }
                         break;
                         }
