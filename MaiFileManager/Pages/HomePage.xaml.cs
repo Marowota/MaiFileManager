@@ -13,6 +13,8 @@ public partial class HomePage : ContentPage
     bool IsAutoChecked { get; set; } = true;
     bool IsRenameMode { get; set; } = false;
     bool FirstLoad = true;
+    bool IsSearched { get; set; } = false;
+    bool IsNavigated { get; set; } = false;
     public HomePage()
     {
         FileListObj = new FileList();
@@ -86,7 +88,12 @@ public partial class HomePage : ContentPage
         }
         else
         {
-            await FileListObj.PathSelectionAsync(sender, e);
+            int mode = await FileListObj.PathSelectionAsync(sender, e);
+            if (mode == 1 && SearchBarBorder.IsVisible)
+            {
+                IsNavigated = true;
+                SearchFileFolder_Clicked(SearchFileFolder, null);
+            }
             BackButton.IsVisible = (FileListObj.BackDeep > 0);
         }
         (sender as CollectionView).SelectedItem = null;
@@ -94,10 +101,17 @@ public partial class HomePage : ContentPage
 
     private async void BackButton_Clicked(object sender, EventArgs e)
     {
-        if (FileListObj.IsSelectionMode) return;
-        if (FileListObj.BackDeep == 0) return;
-        await FileListObj.BackAsync(sender, e);
-        BackButton.IsVisible = (FileListObj.BackDeep > 0);
+        if (SearchBarBorder.IsVisible)
+        {
+            SearchFileFolder_Clicked(SearchFileFolder, null);
+        }
+        else
+        {
+            if (FileListObj.IsSelectionMode) return;
+            if (FileListObj.BackDeep == 0) return;
+            await FileListObj.BackAsync(sender, e);
+            BackButton.IsVisible = (FileListObj.BackDeep > 0);
+        }
     }
 
     protected override bool OnBackButtonPressed()
@@ -109,6 +123,10 @@ public partial class HomePage : ContentPage
         else if (FileListObj.BackDeep > 0)
         {
             BackButton_Clicked(BackButton, EventArgs.Empty);
+        }
+        else if (SearchBarBorder.IsVisible)
+        {
+            SearchFileFolder_Clicked(SearchFileFolder, null);
         }
         else
         {
@@ -208,7 +226,17 @@ public partial class HomePage : ContentPage
     private async void RefreshView_Refreshing(object sender, EventArgs e)
     {
         SwipeFileBox.IsVisible = false;
-        await Task.Run(FileListObj.UpdateFileListAsync);
+        if (!IsSearched)
+        {
+            await Task.Run(FileListObj.UpdateFileListAsync);
+        }
+        else
+        {
+            if (SearchBarFile.IsVisible)
+            {
+                SearchBarFile_SearchButtonPressed(SearchBarFile, null);
+            }
+        }
         SwipeFileBox.IsVisible = true;
         (sender as RefreshView).IsRefreshing = false;
     }
@@ -217,16 +245,46 @@ public partial class HomePage : ContentPage
     {
         if (!FirstLoad)
         {
-            await Task.Run(FileListObj.UpdateFileListAsync);
+            if (!IsSearched)
+            {
+                await Task.Run(FileListObj.UpdateFileListAsync);
+            }
+            else
+            {
+                if (SearchBarFile.IsVisible)
+                {
+                    SearchBarFile_SearchButtonPressed(SearchBarFile, null);
+                }
+            }
         }
         FirstLoad = false;
     }
 
-    private void SearchFileFolder_Clicked(object sender, EventArgs e)
+    private async void SearchFileFolder_Clicked(object sender, EventArgs e)
     {
-
+        SearchBarFile.Text = string.Empty;
+        SearchBarBorder.IsVisible = !SearchBarBorder.IsVisible;
+        PathLbl.IsVisible = !SearchBarBorder.IsVisible;
+        if (IsSearched && !IsNavigated)
+        {
+            await FileListObj.UpdateFileListAsync();
+        }
+        IsSearched = false;
+        IsNavigated = false;
     }
-
+    private async void SearchBarFile_SearchButtonPressed(object sender, EventArgs e)
+    {
+        if (SearchBarFile.Text == null) return;
+        if (FileListObj.IsValidFileName(SearchBarFile.Text))
+        {
+            IsSearched = true;
+            await FileListObj.SearchFileListAsync(SearchBarFile.Text);
+        }
+        else
+        {
+            await Shell.Current.DisplayAlert("Invalid", "Invalid Filename", "OK");
+        }
+    }
     private async void AddNewFolder_Clicked(object sender, EventArgs e)
     {
         bool success = false;
@@ -248,4 +306,5 @@ public partial class HomePage : ContentPage
             }
         } while (!success);
     }
+
 }

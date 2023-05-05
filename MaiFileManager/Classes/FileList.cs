@@ -2,6 +2,7 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using static Android.Icu.Text.IDNA;
 
 namespace MaiFileManager.Classes
 {
@@ -138,25 +139,35 @@ namespace MaiFileManager.Classes
             IsReloading = false;
         }
 
-        internal async Task PathSelectionAsync(object sender, SelectionChangedEventArgs e)
+        internal async Task<int> PathSelectionAsync(object sender, SelectionChangedEventArgs e)
         {
-            if (sender is null) return;
-            if (e.CurrentSelection.Count == 0) return;
+            if (sender is null) return -1;
+            if (e.CurrentSelection.Count == 0) return -1;
             FileSystemInfoWithIcon selectedWIcon = e.CurrentSelection.FirstOrDefault() as FileSystemInfoWithIcon;
             FileSystemInfo selected = selectedWIcon.fileInfo;
             if (selected.GetType() == typeof(FileInfo))
             {
                 FileInfo file = (FileInfo)selected;
                 await Launcher.OpenAsync(new OpenFileRequest("Open File", new ReadOnlyFile(selected.FullName)));
+                return 0;
             }
-            if (selected.GetType() == typeof(DirectoryInfo))
+            else if (selected.GetType() == typeof(DirectoryInfo))
             {
                 if (selected == null)
-                    return;
+                    return -1;
+                int deep = 0;
+                string tmp = selected.FullName;
+                while (tmp != CurrentDirectoryInfo.CurrentDir)
+                {
+                    tmp = Path.GetDirectoryName(tmp);
+                    deep++;
+                }
                 CurrentDirectoryInfo.UpdateDir(selected.FullName);
                 await Task.Run(UpdateFileListAsync);
-                UpdateBackDeep(1);
+                UpdateBackDeep(deep);
+                return 1;
             }
+            return -1;
         }
 
         internal async Task BackAsync(object sender, EventArgs e)
@@ -366,6 +377,44 @@ namespace MaiFileManager.Classes
             await UpdateFileListAsync();
             return true;
         }
+        internal async Task SearchFileListAsync(string value)
+        {
+            IsReloading = true;
+            DirectoryInfo dir = new DirectoryInfo(CurrentDirectoryInfo.CurrentDir);
 
+            IEnumerable<System.IO.DirectoryInfo> directoryList = null;
+            IEnumerable<System.IO.FileInfo> fileList = null;
+            await Task.Run(async () =>
+            {
+                CurrentFileList.Clear();
+                directoryList = dir.GetDirectories(string.Format("*{0}*", value), System.IO.SearchOption.AllDirectories);
+                foreach (DirectoryInfo directoryInfo in directoryList)
+                {
+                    CurrentFileList.Add(new FileSystemInfoWithIcon(directoryInfo, "folder.png", 45));
+                }
+                fileList = dir.GetFiles(string.Format("*{0}*", value), System.IO.SearchOption.AllDirectories);
+                foreach (FileInfo fileInfo in fileList)
+                {
+                    await Task.Run(() => 
+                    {
+                        CurrentFileList.Add(new FileSystemInfoWithIcon(fileInfo, MaiIcon.GetIcon(fileInfo.Extension), 40));
+                    });
+                }
+                if (IsSelectionMode)
+                {
+                    foreach (FileSystemInfoWithIcon f in CurrentFileList)
+                    {
+                        f.CheckBoxSelectVisible = true;
+                    }
+                }
+                NumberOfCheked = 0;
+            });
+            IsReloading = false;
+        }
+        internal bool IsValidFileName(string name)
+        {
+            string invalidList = "|\\?*<\":>+[]/'";
+            return (name.IndexOfAny(invalidList.ToCharArray()) == -1);
+        }
     }
 }

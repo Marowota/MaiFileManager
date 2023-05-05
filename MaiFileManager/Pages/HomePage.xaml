@@ -63,11 +63,25 @@
     </Shell.TitleView>
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="30"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="auto"/>
         </Grid.RowDefinitions>
-        <Label BindingContext="{x:Reference homePage}"
+        <Border x:Name="SearchBarBorder"
+                Grid.Row="0"
+                StrokeShape="RoundRectangle 0,0,5,5"
+                StrokeThickness="1"
+                IsVisible="false">
+            <SearchBar x:Name="SearchBarFile"
+                       HorizontalOptions="FillAndExpand"
+                       SearchButtonPressed="SearchBarFile_SearchButtonPressed"
+                       Placeholder="Search file/folder..."/>
+        </Border>
+        <Label x:Name="PathLbl"
+               HeightRequest="30"
+               Grid.Row="1"
+               BindingContext="{x:Reference homePage}"
                Text="{Binding FileListObj.CurrentDirectoryInfo.CurrentDir}"
                HorizontalOptions="StartAndExpand"
                HorizontalTextAlignment="Start"
@@ -76,7 +90,7 @@
                LineBreakMode="HeadTruncation"
                FontAttributes="Bold"/>
         <Border x:Name="OptionBar"
-                Grid.Row="2"
+                Grid.Row="3"
                 StrokeShape="RoundRectangle 5,5,0,0"
                 StrokeThickness="1"
                 IsVisible="false">
@@ -129,13 +143,13 @@
             </Grid>
         </Border>
         <ActivityIndicator x:Name="LoadingFile" 
-                           Grid.Row="1"
+                           Grid.Row="2"
                            BindingContext="{x:Reference homePage}"
                            IsRunning="{Binding FileListObj.IsReloading}"
                            HeightRequest="50"
                            WidthRequest="50"/>
         <RefreshView Refreshing="RefreshView_Refreshing"
-                     Grid.Row="1">
+                     Grid.Row="2">
             <SwipeView SwipeStarted="SwipeView_SwipeStarted"
                        FlowDirection="LeftToRight"
                        x:Name="SwipeFileBox"
