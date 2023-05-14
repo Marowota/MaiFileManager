@@ -11,15 +11,17 @@
     <Shell.TitleView>
         <Grid>
             <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="auto"/>
                 <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="35"/>
+                <ColumnDefinition Width="10"/>
                 <ColumnDefinition Width="30"/>
                 <ColumnDefinition Width="10"/>
                 <ColumnDefinition Width="40"/>
                 <ColumnDefinition Width="auto"/>
                 <ColumnDefinition Width="10"/>
             </Grid.ColumnDefinitions>
-            <HorizontalStackLayout >
-                <ImageButton x:Name="BackButton"
+            <ImageButton x:Name="BackButton"
                     Source="back.png"
                     Clicked="BackButton_Clicked"
                     HorizontalOptions="Start"
@@ -27,31 +29,37 @@
                     HeightRequest="40"
                     WidthRequest="40"
                     IsVisible="false"/>
-                <Label BindingContext="{x:Reference homePage}"
+            <Label BindingContext="{x:Reference homePage}"
                    Text="{Binding FileListObj.CurrentDirectoryInfo.DirName}"
+                   Grid.Column="1"
                    HorizontalTextAlignment="Start"
                    VerticalTextAlignment="Center"
-                   HorizontalOptions="StartAndExpand"
+                   HorizontalOptions="Start"
                    VerticalOptions="CenterAndExpand"
                    TextColor="White"
                    LineBreakMode="TailTruncation"
                    FontAttributes="Bold"
                    FontSize="Title"/>
-            </HorizontalStackLayout>
+            <ImageButton x:Name="SortFileBy"
+                         Grid.Column="2"
+                         HorizontalOptions="CenterAndExpand"
+                         VerticalOptions="CenterAndExpand"
+                         Source="sort.png"
+                         Clicked="SortFileBy_Clicked"/>
             <ImageButton x:Name="SearchFileFolder"
-                         Grid.Column="1"
+                         Grid.Column="4"
                          HorizontalOptions="CenterAndExpand"
                          VerticalOptions="CenterAndExpand"
                          Source="searchfile.png"
                          Clicked="SearchFileFolder_Clicked"/>
             <ImageButton x:Name="AddNewFolder"
-                         Grid.Column="3"
+                         Grid.Column="6"
                          HorizontalOptions="CenterAndExpand"
                          VerticalOptions="CenterAndExpand"
                          Source="newfolder.png"
                          Clicked="AddNewFolder_Clicked"/>
             <ImageButton x:Name="CancleMultipleSelection"
-                         Grid.Column="4"
+                         Grid.Column="7"
                          WidthRequest="30"
                          Margin="10,0,0,0"
                          HorizontalOptions="CenterAndExpand"
@@ -93,6 +101,7 @@
                 Grid.Row="3"
                 StrokeShape="RoundRectangle 5,5,0,0"
                 StrokeThickness="1"
+                BackgroundColor="Transparent"
                 IsVisible="false">
             <Grid>
                 <Grid.ColumnDefinitions>

@@ -24,5 +24,8 @@
                 </DataTemplate>
             </ShellContent.ContentTemplate>
         </ShellContent>
+        <ShellContent Icon="settings.png"
+                      Title="Settings"
+                      ContentTemplate="{DataTemplate pages:Setting}"/>
     </TabBar>
 </Shell>

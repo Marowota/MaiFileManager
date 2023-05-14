@@ -209,12 +209,14 @@ public partial class HomePage : ContentPage
         string result = await Shell.Current.DisplayPromptAsync("Rename", "Renaming:"
                                                                        + Path.GetFileName(path)
                                                                        + "\nType new file name:\n");
-        while (result == "")
+        if (result == null) return;
+        while (result == "" || !FileListObj.IsValidFileName(result))
         {
             await Shell.Current.DisplayAlert("Invalid", "Please type a name", "OK");
             result = await Shell.Current.DisplayPromptAsync("Rename", "Renaming:"
                                                                     + Path.GetFileName(path)
                                                                     + "\nType new file name:\n");
+            if (result == null) return;
         }
         if (result != null)
         {
@@ -307,4 +309,19 @@ public partial class HomePage : ContentPage
         } while (!success);
     }
 
+    private async void SortFileBy_Clicked(object sender, EventArgs e)
+    {
+        string[] sortby = new string[] {"Name (A to Z)",
+                                        "Name (Z to A)",
+                                        "Size (Small to Large)",
+                                        "Size (Large to Small)",
+                                        "File type (A to Z)",
+                                        "File type (Z to A)",
+                                        "Last modified (New to Old)",
+                                        "Last modified (Old to New)"};
+        string asResult = await Shell.Current.DisplayActionSheet("Sort by", "Cancel", null, sortby);
+        if (asResult == "Cancel" || asResult == null) return;
+        FileListObj.SortMode = (FileList.FileSortMode)sortby.ToList().IndexOf(asResult);
+        await FileListObj.UpdateFileListAsync();
+    }
 }

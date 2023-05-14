@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="MaiFileManager.Pages.Setting"
+             Title="Setting">
+    <Shell.TitleView>
+        <Label Text="Settings"
+                HorizontalTextAlignment="Start"
+                VerticalTextAlignment="Center"
+                HorizontalOptions="StartAndExpand"
+                VerticalOptions="CenterAndExpand"
+                TextColor="White"
+                LineBreakMode="TailTruncation"
+                FontAttributes="Bold"
+                FontSize="Title"/>
+    </Shell.TitleView>
+    <VerticalStackLayout>
+        <Border StrokeThickness="1"
+                StrokeShape="RoundRectangle 5,5,5,5"
+                BackgroundColor="Transparent">
+            <VerticalStackLayout Padding="15,5">
+                <Label Text="Theme"
+                       TextColor="{AppThemeBinding Light={StaticResource Black}, Dark={StaticResource White}}"
+                       FontAttributes="Bold"
+                       FontSize="Medium"/>
+                <RadioButton x:Name="DefaultRd"  Content="Default" Margin="10,0" CheckedChanged="DefaultRd_CheckedChanged"/>
+                <RadioButton x:Name="LightRd" Content="Light" Margin="10,0" CheckedChanged="LightRd_CheckedChanged"/>
+                <RadioButton x:Name="DarkRd" Content="Dark" Margin="10,0" CheckedChanged="DarkRd_CheckedChanged"/>
+            </VerticalStackLayout>
+        </Border>
+        <Border StrokeThickness="1"
+                StrokeShape="RoundRectangle 5,5,5,5"
+                BackgroundColor="Transparent">
+            <VerticalStackLayout Padding="15,5">
+                <Label Text="Default sort mode"
+                       TextColor="{AppThemeBinding Light={StaticResource Black}, Dark={StaticResource White}}"
+                       FontAttributes="Bold"
+                       FontSize="Medium"/>
+                <RadioButton x:Name="NameAZ" Content="Name (A to Z)" Margin="10,0" CheckedChanged="NameAZ_CheckedChanged"/>
+                <RadioButton x:Name="NameZA" Content="Name (Z to A)" Margin="10,0" CheckedChanged="NameZA_CheckedChanged"/>
+                <RadioButton x:Name="SizeSL" Content="Size (Small to Large)" Margin="10,0" CheckedChanged="SizeSL_CheckedChanged"/>
+                <RadioButton x:Name="SizeLS" Content="Size (Large to Small)" Margin="10,0" CheckedChanged="SizeLS_CheckedChanged"/>
+                <RadioButton x:Name="TypeAZ" Content="File type (A to Z)" Margin="10,0" CheckedChanged="TypeAZ_CheckedChanged"/>
+                <RadioButton x:Name="TypeZA" Content="File type (Z to A)" Margin="10,0" CheckedChanged="TypeZA_CheckedChanged"/>
+                <RadioButton x:Name="DateNO" Content="Last modified (New to Old)" Margin="10,0" CheckedChanged="DateNO_CheckedChanged"/>
+                <RadioButton x:Name="DateON" Content="Last modified (Old to New)" Margin="10,0" CheckedChanged="DateON_CheckedChanged"/>
+            </VerticalStackLayout>
+        </Border>
+    </VerticalStackLayout>
+</ContentPage>

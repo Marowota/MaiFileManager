@@ -1,4 +1,5 @@
-﻿using MaiFileManager.Services;
+﻿using CommunityToolkit.Maui.Core.Primitives;
+using MaiFileManager.Services;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
@@ -17,7 +18,19 @@ namespace MaiFileManager.Classes
             Cut, 
             Copy,
         }
-        
+
+        public enum FileSortMode
+        {
+            NameAZ,
+            NameZA,
+            SizeSL,
+            SizeLS,
+            TypeAZ,
+            TypeZA,
+            DateNO,
+            DateON
+        }
+
         public event PropertyChangedEventHandler PropertyChanged;
 
         public ObservableCollection<FileSystemInfoWithIcon> CurrentFileList { get; set; } = new ObservableCollection<FileSystemInfoWithIcon>();
@@ -28,6 +41,7 @@ namespace MaiFileManager.Classes
         public bool IsSelectionMode { get; set; } = false;
         public int NumberOfCheked { get; set; } = 0;
         private bool isReloading = true;
+        public FileSortMode SortMode = (FileSortMode)Preferences.Default.Get("Sort_by", 0);
         public bool IsReloading
         {
             get
@@ -81,7 +95,120 @@ namespace MaiFileManager.Classes
             return true;
         }
         #endregion
+        internal int SortFileComparisonFolderToFile(FileSystemInfo x, FileSystemInfo y)
+        {
+            return (x.GetType() == y.GetType() ? 0 : (x.GetType() == typeof(DirectoryInfo) ? -1 : 1));
+        }
+        internal int SortFileComparisonNameAZ(FileSystemInfo x, FileSystemInfo y)
+        {
+            int tmp = SortFileComparisonFolderToFile(x, y);
+            if (tmp != 0) return tmp;
 
+            return string.Compare(x.Name, y.Name, StringComparison.OrdinalIgnoreCase);
+        }
+
+        internal int SortFileComparisonNameZA(FileSystemInfo x, FileSystemInfo y)
+        {
+            int tmp = SortFileComparisonFolderToFile(x, y);
+            if (tmp != 0) return tmp;
+
+            return string.Compare(y.Name, x.Name, StringComparison.OrdinalIgnoreCase);
+        }
+
+        internal int SortFileComparisonSizeSL(FileSystemInfo x, FileSystemInfo y)
+        {
+            int tmp = SortFileComparisonFolderToFile(x, y);
+            if (tmp != 0) return tmp;
+
+            long sizeX = 0, sizeY = 0;
+            if (x.GetType() == typeof(FileInfo))
+            {
+                sizeX = (x as FileInfo).Length;
+            }
+            if (y.GetType() == typeof(FileInfo))
+            {
+                sizeY = (y as FileInfo).Length;
+            }
+            return (sizeX < sizeY ? -1 : (sizeX > sizeY ? 1 : 0));
+        }
+        internal int SortFileComparisonSizeLS(FileSystemInfo x, FileSystemInfo y)
+        {
+            int tmp = SortFileComparisonFolderToFile(x, y);
+            if (tmp != 0) return tmp;
+
+            long sizeX = 0, sizeY = 0;
+            if (x.GetType() == typeof(FileInfo))
+            {
+                sizeX = (x as FileInfo).Length;
+            }
+            if (y.GetType() == typeof(FileInfo))
+            {
+                sizeY = (y as FileInfo).Length;
+            }
+            return (sizeX > sizeY ? -1 : (sizeX < sizeY ? 1 : 0));
+        }
+        internal int SortFileComparisonTypeAZ(FileSystemInfo x, FileSystemInfo y)
+        {
+            int tmp = SortFileComparisonFolderToFile(x, y);
+            if (tmp != 0) return tmp;
+
+            return string.Compare(x.Extension, y.Extension, StringComparison.OrdinalIgnoreCase);
+        }
+        internal int SortFileComparisonTypeZA(FileSystemInfo x, FileSystemInfo y)
+        {
+            int tmp = SortFileComparisonFolderToFile(x, y);
+            if (tmp != 0) return tmp;
+
+            return string.Compare(y.Extension, x.Extension, StringComparison.OrdinalIgnoreCase);
+        }
+        internal int SortFileComparisonDateNO(FileSystemInfo x, FileSystemInfo y)
+        {
+            int tmp = SortFileComparisonFolderToFile(x, y);
+            if (tmp != 0) return tmp;
+
+            return DateTime.Compare(y.LastWriteTime, x.LastWriteTime);
+        }
+        internal int SortFileComparisonDateON(FileSystemInfo x, FileSystemInfo y)
+        {
+            int tmp = SortFileComparisonFolderToFile(x, y);
+            if (tmp != 0) return tmp;
+
+            return DateTime.Compare(x.LastWriteTime, y.LastWriteTime);
+        }
+        internal List<FileSystemInfo> SortFileMode(List<FileSystemInfo> fsi)
+        {
+            Comparison<FileSystemInfo> compare = new Comparison<FileSystemInfo>(SortFileComparisonNameAZ);
+
+            switch (SortMode)
+            {
+                case FileSortMode.NameAZ:
+                    compare = new Comparison<FileSystemInfo>(SortFileComparisonNameAZ);
+                    break;
+                case FileSortMode.NameZA:
+                    compare = new Comparison<FileSystemInfo>(SortFileComparisonNameZA);
+                    break;
+                case FileSortMode.SizeSL:
+                    compare = new Comparison<FileSystemInfo>(SortFileComparisonSizeSL);
+                    break;
+                case FileSortMode.SizeLS:
+                    compare = new Comparison<FileSystemInfo>(SortFileComparisonSizeLS);
+                    break;
+                case FileSortMode.TypeAZ:
+                    compare = new Comparison<FileSystemInfo>(SortFileComparisonTypeAZ);
+                    break;
+                case FileSortMode.TypeZA:
+                    compare = new Comparison<FileSystemInfo>(SortFileComparisonTypeZA);
+                    break;
+                case FileSortMode.DateNO:
+                    compare = new Comparison<FileSystemInfo>(SortFileComparisonDateNO);
+                    break;
+                case FileSortMode.DateON:
+                    compare = new Comparison<FileSystemInfo>(SortFileComparisonDateON);
+                    break;
+            }
+            fsi.Sort(compare);
+            return fsi;
+        }
         internal async Task InitialLoadAsync()
         {
             bool accepted = await RequestPermAsync();
@@ -112,7 +239,7 @@ namespace MaiFileManager.Classes
             await Task.Run(async () =>
             {
                 CurrentFileList.Clear();
-                foreach (FileSystemInfo info in CurrentDirectoryInfo.GetListFile())
+                foreach (FileSystemInfo info in SortFileMode(CurrentDirectoryInfo.GetListFile().ToList()))
                 {
                     await Task.Run(() =>
                     {

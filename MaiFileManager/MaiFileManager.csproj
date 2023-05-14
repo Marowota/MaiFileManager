@@ -63,7 +63,9 @@
 	  <None Remove="Resources\Images\newfolder.png" />
 	  <None Remove="Resources\Images\paste.png" />
 	  <None Remove="Resources\Images\searchfile.png" />
+	  <None Remove="Resources\Images\settings.png" />
 	  <None Remove="Resources\Images\sfolder.png" />
+	  <None Remove="Resources\Images\sort.png" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -76,6 +78,9 @@
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Pages\HomePage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Pages\Setting.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	</ItemGroup>
