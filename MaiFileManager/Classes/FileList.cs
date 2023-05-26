@@ -535,12 +535,16 @@ namespace MaiFileManager.Classes
             await Task.Run(async () =>
             {
                 CurrentFileList.Clear();
-                directoryList = dir.GetDirectories(string.Format("*{0}*", value), System.IO.SearchOption.AllDirectories);
+                directoryList = dir.GetDirectories("**", System.IO.SearchOption.AllDirectories)
+                                   .Where(dirInfo 
+                                    => dirInfo.Name.Contains(value, StringComparison.OrdinalIgnoreCase));
                 foreach (DirectoryInfo directoryInfo in directoryList)
                 {
                     CurrentFileList.Add(new FileSystemInfoWithIcon(directoryInfo, "folder.png", 45));
                 }
-                fileList = dir.GetFiles(string.Format("*{0}*", value), System.IO.SearchOption.AllDirectories);
+                fileList = dir.GetFiles("**", System.IO.SearchOption.AllDirectories)
+                              .Where(fileInfo
+                              => fileInfo.Name.Contains(value, StringComparison.OrdinalIgnoreCase));
                 foreach (FileInfo fileInfo in fileList)
                 {
                     await Task.Run(() => 
