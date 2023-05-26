@@ -78,13 +78,16 @@
         </Grid.RowDefinitions>
         <Border x:Name="SearchBarBorder"
                 Grid.Row="0"
+                BackgroundColor="Transparent"
                 StrokeShape="RoundRectangle 0,0,5,5"
                 StrokeThickness="1"
                 IsVisible="false">
-            <SearchBar x:Name="SearchBarFile"
+            <StackLayout>
+                <SearchBar x:Name="SearchBarFile"
                        HorizontalOptions="FillAndExpand"
                        SearchButtonPressed="SearchBarFile_SearchButtonPressed"
                        Placeholder="Search file/folder..."/>
+            </StackLayout>
         </Border>
         <Label x:Name="PathLbl"
                HeightRequest="30"
@@ -181,8 +184,7 @@
                             EmptyView="No File or Folder found">
                     <CollectionView.ItemTemplate>
                         <DataTemplate>
-                            <Border 
-                                    StrokeThickness="1"
+                            <Border StrokeThickness="1"
                                     StrokeShape="RoundRectangle 5,5,5,5"
                                     Background="Transparent"
                                     Padding="12,8"

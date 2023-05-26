@@ -9,9 +9,9 @@
                       Icon="sfolder.png"
                       Title="Files"
                       ContentTemplate="{DataTemplate pages:HomePage}"/>
-        <ShellContent Icon="heart.png"
+        <!--<ShellContent Icon="heart.png"
                       Title="Favourite"
-                      ContentTemplate="{DataTemplate pages:Favourite}"/>
+                      ContentTemplate="{DataTemplate pages:Favourite}"/>-->
         <ShellContent Icon="download.png"
                       Title="Downloaded">
             <ShellContent.ContentTemplate>

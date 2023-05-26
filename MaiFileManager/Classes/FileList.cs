@@ -499,7 +499,7 @@ namespace MaiFileManager.Classes
                             {
                                 if (IsDirectoryContainDirectory(f.fileInfo.FullName, CurrentDirectoryInfo.CurrentDir))
                                 {
-                                    await Shell.Current.DisplayAlert("Error", f.fileInfo.Name + "\nCannot cut to itself", "OK");
+                                    await Shell.Current.DisplayAlert("Error", f.fileInfo.Name + "\nCannot copy to itself", "OK");
                                     continue;
                                 }
                                 else
