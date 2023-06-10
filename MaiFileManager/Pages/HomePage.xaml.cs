@@ -208,7 +208,6 @@ public partial class HomePage : ContentPage
         if (result)
         {
             await Navigation.PushModalAsync(new PerformingAction(FileListObj, PerformingAction.ActionType.delete));
-            await Shell.Current.DisplayAlert("Deleted", "Selected file(s) deleted", "OK");
         }
     }
 

@@ -57,7 +57,7 @@ namespace MaiFileManager.Classes
             set
             {
                 operatedPercent = value;
-                operatedStatusString = string.Format("{0:0.0} %, {1} / {2} file(s) and folder(s) operated",
+                operatedStatusString = string.Format("{0:0} %, {1} / {2}",
                                                      operatedPercent * 100,
                                                      OperatedFileList.Count - OperatedFileListView.Count,
                                                      OperatedFileList.Count);
@@ -437,11 +437,13 @@ namespace MaiFileManager.Classes
 
         internal async Task DeleteModeAsync()
         {
+            OperatedFileList.Clear();
             OperatedFileListView.Clear();
             foreach (FileSystemInfoWithIcon f in CurrentFileList)
             {
                 if (f.CheckBoxSelected)
                 {
+                    OperatedFileList.Add(f);
                     OperatedFileListView.Add(f);
                 }
             }
@@ -517,6 +519,7 @@ namespace MaiFileManager.Classes
         }
         internal async Task PasteModeAsync()
         {
+            OperatedFileListView.Clear();
             foreach (FileSystemInfoWithIcon f in OperatedFileList)
             {
                 OperatedFileListView.Add(f);

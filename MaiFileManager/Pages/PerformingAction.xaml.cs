@@ -16,7 +16,7 @@ public partial class PerformingAction : ContentPage
 
     public FileList currentFileListObj { get; set; } = null;
     ActionType curretAt { get; set; }
-    System.Timers.Timer t = new System.Timers.Timer(750);
+    System.Timers.Timer t = new System.Timers.Timer(500);
 
     public PerformingAction()
     {
@@ -42,15 +42,29 @@ public partial class PerformingAction : ContentPage
         {
             return;
         }
-
-
         switch (curretAt)
         {
             case ActionType.paste:
-                await currentFileListObj.PasteModeAsync();
+                await this.Dispatcher.DispatchAsync( () => {
+                    lblType.Text = (currentFileListObj.OperatedOption == FileList.FileSelectOption.Cut ? "Moving..." :
+                                                  currentFileListObj.OperatedOption == FileList.FileSelectOption.Copy ? "Copying..." : "Do nothing...");
+                });
+              
+                await currentFileListObj.PasteModeAsync(); 
+                
+                await this.Dispatcher.DispatchAsync(() => {
+                    lblType.Text = (currentFileListObj.OperatedOption == FileList.FileSelectOption.Cut ? "Moved" :
+                                currentFileListObj.OperatedOption == FileList.FileSelectOption.Copy ? "Copied" : "Did nothing!");
+                });
                 break;
             case ActionType.delete:
-                await currentFileListObj.DeleteModeAsync();
+                await this.Dispatcher.DispatchAsync(() => {
+                    lblType.Text = "Deleting...";
+                });
+                await currentFileListObj.DeleteModeAsync(); 
+                await this.Dispatcher.DispatchAsync(() => {
+                    lblType.Text = "Deleted";
+                });
                 break;
         }
         currentFileListObj.NavigatedPage = null;
