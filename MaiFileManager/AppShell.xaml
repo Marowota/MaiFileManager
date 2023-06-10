@@ -27,5 +27,7 @@
         <ShellContent Icon="settings.png"
                       Title="Settings"
                       ContentTemplate="{DataTemplate pages:Setting}"/>
+        <ShellContent Title="Devonly"
+                      ContentTemplate="{DataTemplate pages:Devonly}"/>
     </TabBar>
 </Shell>

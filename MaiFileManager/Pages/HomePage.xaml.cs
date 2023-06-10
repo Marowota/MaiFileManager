@@ -175,14 +175,16 @@ public partial class HomePage : ContentPage
         SelecitonMode(false);
     }
 
-    private void Cut_Clicked(object sender, EventArgs e)
+    private async void Cut_Clicked(object sender, EventArgs e)
     {
         FileListObj.ModifyMode(FileList.FileSelectOption.Cut);
+        await Shell.Current.DisplayAlert("Done", "Move action remembered", "OK");
     }
 
-    private void Copy_Clicked(object sender, EventArgs e)
+    private async void Copy_Clicked(object sender, EventArgs e)
     {
         FileListObj.ModifyMode(FileList.FileSelectOption.Copy);
+        await Shell.Current.DisplayAlert("Done", "Copy action remembered", "OK");
     }
 
     private async void Paste_Clicked(object sender, EventArgs e)
@@ -199,6 +201,7 @@ public partial class HomePage : ContentPage
         if (result)
         {
             await FileListObj.DeleteModeAsync();
+            await Shell.Current.DisplayAlert("Deleted", "Selected file(s) delted", "OK");
         }
     }
 
