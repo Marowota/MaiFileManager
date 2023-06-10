@@ -2,6 +2,7 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="MaiFileManager.Pages.PerformingAction"
+             x:Name="PerformActionPage"
              Title="PerformingAction">
     <Shell.TitleView>
         <Label  x:Name="lblAction"
@@ -15,10 +16,66 @@
                 FontAttributes="Bold"
                 FontSize="Title"/>
     </Shell.TitleView>
-    <VerticalStackLayout>
-        <Label 
-            Text="Welcome to .NET MAUI!"
-            VerticalOptions="Center" 
-            HorizontalOptions="Center" />
-    </VerticalStackLayout>
+    <Grid RowDefinitions="Auto, 30, *">
+        <ProgressBar BindingContext="{x:Reference PerformActionPage}"
+                     Progress="{Binding currentFileListObj.OperatedPercent}" 
+                     Margin="10,20,10,20"
+                     x:Name="prbProgress"/>
+        <Label  x:Name="lblProgress"
+                BindingContext="{x:Reference PerformActionPage}"
+                FontSize="Medium"
+                Text="{Binding currentFileListObj.OperatedStatusString}"
+                HorizontalTextAlignment="Center"
+                VerticalTextAlignment="Center"
+                HorizontalOptions="CenterAndExpand"
+                VerticalOptions="CenterAndExpand"
+                FontAttributes="Bold"
+                Grid.Row="1"/>
+        <CollectionView x:Name="FileListView"
+                            BindingContext="{x:Reference PerformActionPage}"
+                            ItemsSource="{Binding currentFileListObj.OperatedFileListView}"
+                            SelectionMode="Single"
+                            HorizontalScrollBarVisibility="Default"
+                            EmptyView="No File or Folder found"
+                            Grid.Row="2">
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Border StrokeThickness="1"
+                                    StrokeShape="RoundRectangle 5,5,5,5"
+                                    Background="Transparent"
+                                    Padding="12,8"
+                                    Margin="0,1">
+                        <Grid Padding="10, 10">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="{Binding iconSize}" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="60" />
+                            </Grid.ColumnDefinitions>
+                            <Image Source="{Binding iconPath}" 
+                                        Grid.Column="1"
+                                        Grid.RowSpan="2"
+                                        Margin="0,0,10,0"/>
+                            <Label Grid.Column="2"
+                                        Text="{Binding fileInfo.Name}"
+                                        FontAttributes="Bold" />
+                            <Label Grid.Column="3"
+                                        Text="{Binding fileInfoSize}"
+                                        FontAttributes="Bold" 
+                                        HorizontalOptions="EndAndExpand"/>
+                            <Label Grid.Row="1"
+                                        Grid.Column="2"
+                                        Grid.ColumnSpan="2"
+                                        Text="{Binding lastModified}"
+                                        VerticalOptions="End" />
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+    </Grid>
 </ContentPage>

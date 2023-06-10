@@ -178,6 +178,7 @@ public partial class HomePage : ContentPage
     private async void Cut_Clicked(object sender, EventArgs e)
     {
         FileListObj.ModifyMode(FileList.FileSelectOption.Cut);
+
         await Shell.Current.DisplayAlert("Done", "Move action remembered", "OK");
     }
 
@@ -189,7 +190,13 @@ public partial class HomePage : ContentPage
 
     private async void Paste_Clicked(object sender, EventArgs e)
     {
-        await FileListObj.PasteModeAsync();
+        await Navigation.PushModalAsync(new PerformingAction(FileListObj, PerformingAction.ActionType.paste));
+        //var navigationParameter = new Dictionary<string, object>
+        //{
+        //    { "atype" ,PerformingAction.ActionType.paste},
+        //    { "flobj", FileListObj }
+        //};
+        //await Shell.Current.GoToAsync($"perfact", navigationParameter);
     }
 
     private async void Delete_Clicked(object sender, EventArgs e)
@@ -200,8 +207,8 @@ public partial class HomePage : ContentPage
                                                        "No");
         if (result)
         {
-            await FileListObj.DeleteModeAsync();
-            await Shell.Current.DisplayAlert("Deleted", "Selected file(s) delted", "OK");
+            await Navigation.PushModalAsync(new PerformingAction(FileListObj, PerformingAction.ActionType.delete));
+            await Shell.Current.DisplayAlert("Deleted", "Selected file(s) deleted", "OK");
         }
     }
 

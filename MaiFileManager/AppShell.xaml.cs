@@ -1,9 +1,13 @@
-﻿namespace MaiFileManager;
+﻿using MaiFileManager.Pages;
+
+namespace MaiFileManager;
 
 public partial class AppShell : Shell
 {
 	public AppShell()
     {
-        InitializeComponent();
+        InitializeComponent(); 
+        Routing.RegisterRoute("perfact", typeof(PerformingAction));
+
     }
 }

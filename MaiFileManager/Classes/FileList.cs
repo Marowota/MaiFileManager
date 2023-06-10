@@ -1,9 +1,9 @@
 ﻿using CommunityToolkit.Maui.Core.Primitives;
 using MaiFileManager.Services;
+using Microsoft.Maui.Dispatching;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using static Android.Icu.Text.IDNA;
 
 namespace MaiFileManager.Classes
 {
@@ -42,6 +42,36 @@ namespace MaiFileManager.Classes
         public int NumberOfCheked { get; set; } = 0;
         private bool isReloading = true;
         public FileSortMode SortMode = (FileSortMode)Preferences.Default.Get("Sort_by", 0);
+        System.Timers.Timer delayTime = new System.Timers.Timer(500);
+        public ObservableCollection<FileSystemInfoWithIcon> OperatedFileListView { get; set; } = new ObservableCollection<FileSystemInfoWithIcon>();
+        public List<FileSystemInfoWithIcon> PendingOperatedFileListView = new List<FileSystemInfoWithIcon> ();
+        private double operatedPercent = 0;
+        private string operatedStatusString = "";
+        public Page NavigatedPage = null;
+        public double OperatedPercent
+        {
+            get
+            {
+                return operatedPercent;
+            }
+            set
+            {
+                operatedPercent = value;
+                operatedStatusString = string.Format("{0:0.0} %, {1} / {2} file(s) and folder(s) operated",
+                                                     operatedPercent * 100,
+                                                     OperatedFileList.Count - OperatedFileListView.Count,
+                                                     OperatedFileList.Count);
+                OnPropertyChanged(nameof(OperatedPercent));
+                OnPropertyChanged(nameof(OperatedStatusString));
+            }
+        }
+        public string OperatedStatusString
+        {
+            get
+            {
+                return operatedStatusString;
+            }
+        }
         public bool IsReloading
         {
             get
@@ -65,14 +95,28 @@ namespace MaiFileManager.Classes
         public FileList()
         {
             CurrentDirectoryInfo = new FileManager();
+            InitTimer();
         }
         public FileList(int type)
         {
             CurrentDirectoryInfo = new FileManager(type);
+            InitTimer();
         }
         public FileList(string path)
         {
-            CurrentDirectoryInfo = new FileManager(path); 
+            CurrentDirectoryInfo = new FileManager(path);
+            InitTimer();
+        }
+
+        void InitTimer()
+        {
+            delayTime.Interval = 500;
+            delayTime.Elapsed += DelayTime_Elapsed;
+            delayTime.Start();
+        }
+
+        private void DelayTime_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
+        {
         }
 
         public void OnPropertyChanged([CallerMemberName] string name = "") =>
@@ -358,11 +402,23 @@ namespace MaiFileManager.Classes
             bool result = false;
             if (File.Exists(dir))
             {
-                result = await Shell.Current.DisplayAlert("Existed", "File "
-                                                            + dirName
-                                                            + "already exists in this directory\n"
-                                                            + "Write new file or keep old file?",
-                                                            "Write new", "Keep old");
+                Page tmp;
+                if (NavigatedPage == null)
+                {
+                    tmp = Shell.Current.CurrentPage;
+                }
+                else
+                {
+                    tmp = NavigatedPage;
+                }
+                await tmp.Dispatcher.DispatchAsync(async () => {
+                        result = await tmp.DisplayAlert("Existed", "File "
+                                                                    + dirName
+                                                                    + "already exists in this directory\n"
+                                                                    + "Write new file or keep old file?",
+                                                                    "Write new", "Keep old");
+                    });
+
             }
             return result;
         }
@@ -381,6 +437,17 @@ namespace MaiFileManager.Classes
 
         internal async Task DeleteModeAsync()
         {
+            OperatedFileListView.Clear();
+            foreach (FileSystemInfoWithIcon f in CurrentFileList)
+            {
+                if (f.CheckBoxSelected)
+                {
+                    OperatedFileListView.Add(f);
+                }
+            }
+            OperatedPercent = 0;
+            int tmpInit = OperatedFileListView.Count;
+            int tmpDone = 0;
             foreach (FileSystemInfoWithIcon f in CurrentFileList)
             {
                 if (f.CheckBoxSelected)
@@ -394,6 +461,9 @@ namespace MaiFileManager.Classes
                         (f.fileInfo as DirectoryInfo).Delete(true);
                     }
                 }
+                tmpDone++;
+                OperatedFileListView.Remove(f);
+                OperatedPercent = (double)tmpDone / tmpInit;
             }
             await UpdateFileListAsync();
             OperatedFileList.Clear();
@@ -405,7 +475,19 @@ namespace MaiFileManager.Classes
                 string newPath = Path.Combine(Directory.GetParent(path).FullName, newName);
                 if (Directory.Exists(newPath))
                 {
-                    await Shell.Current.DisplayAlert("Duplicated", "Duplicate folder name, please choose another name", "OK");
+                    Page tmp;
+                    if (NavigatedPage == null)
+                    {
+                        tmp = Shell.Current.CurrentPage;
+                    }
+                    else
+                    {
+                        tmp = NavigatedPage;
+                    }
+                    //maybe dont need
+                    await tmp.Dispatcher.DispatchAsync(async () => {
+                        await tmp.DisplayAlert("Duplicated", "Duplicate folder name, please choose another name", "OK");
+                    });
                     return;
                 }
                 Directory.Move(path, newPath);
@@ -415,7 +497,17 @@ namespace MaiFileManager.Classes
                 string newPath = Path.Combine(Directory.GetParent(path).FullName, newName) + Path.GetExtension(path);
                 if (File.Exists(newPath))
                 {
-                    await Shell.Current.DisplayAlert("Duplicated", "Duplicate file name, please choose another name", "OK");
+                    Page tmp;
+                    if (NavigatedPage == null)
+                    {
+                        tmp = Shell.Current.CurrentPage;
+                    }
+                    else
+                    {
+                        tmp = NavigatedPage;
+                    }
+                    //maybe dont need
+                    await tmp.Dispatcher.DispatchAsync(async () => { await tmp.DisplayAlert("Duplicated", "Duplicate file name, please choose another name", "OK"); });
                     return;
                 }
 
@@ -425,6 +517,11 @@ namespace MaiFileManager.Classes
         }
         internal async Task PasteModeAsync()
         {
+            foreach (FileSystemInfoWithIcon f in OperatedFileList)
+            {
+                OperatedFileListView.Add(f);
+            }
+            OperatedPercent = 0;
             foreach (FileSystemInfoWithIcon f in OperatedFileList)
             {
                 switch (OperatedOption)
@@ -458,12 +555,30 @@ namespace MaiFileManager.Classes
                                 string targetFilePath = Path.Combine(CurrentDirectoryInfo.CurrentDir, f.fileInfo.Name);
                                 if (IsDirectoryContainDirectory(f.fileInfo.FullName, CurrentDirectoryInfo.CurrentDir))
                                 {
-                                    await Shell.Current.DisplayAlert("Error", f.fileInfo.Name + "\nCannot cut to itself", "OK");
+                                    Page tmp;
+                                    if (NavigatedPage == null)
+                                    {
+                                        tmp = Shell.Current.CurrentPage;
+                                    }
+                                    else
+                                    {
+                                        tmp = NavigatedPage;
+                                    }
+                                    await tmp.Dispatcher.DispatchAsync(async () => { await tmp.DisplayAlert("Error", f.fileInfo.Name + "\nCannot cut to itself", "OK"); });
                                     continue;
                                 }
                                 if (Directory.Exists(targetFilePath))
                                 {
-                                    await Shell.Current.DisplayAlert("Error", f.fileInfo.Name + "\nDirectory with same name already exists", "OK");
+                                    Page tmp;
+                                    if (NavigatedPage == null)
+                                    {
+                                        tmp = Shell.Current.CurrentPage;
+                                    }
+                                    else
+                                    {
+                                        tmp = NavigatedPage;
+                                    }
+                                    await tmp.Dispatcher.DispatchAsync(async () => { await tmp.DisplayAlert("Error", f.fileInfo.Name + "\nDirectory with same name already exists", "OK"); });
                                     continue;
                                 }
                                 (f.fileInfo as DirectoryInfo).MoveTo(targetFilePath);
@@ -499,7 +614,16 @@ namespace MaiFileManager.Classes
                             {
                                 if (IsDirectoryContainDirectory(f.fileInfo.FullName, CurrentDirectoryInfo.CurrentDir))
                                 {
-                                    await Shell.Current.DisplayAlert("Error", f.fileInfo.Name + "\nCannot copy to itself", "OK");
+                                    Page tmp;
+                                    if (NavigatedPage == null)
+                                    {
+                                        tmp = Shell.Current.CurrentPage;
+                                    }
+                                    else
+                                    {
+                                        tmp = NavigatedPage;
+                                    }
+                                    await tmp.Dispatcher.DispatchAsync(async () => { await tmp.DisplayAlert("Error", f.fileInfo.Name + "\nCannot copy to itself", "OK"); });
                                     continue;
                                 }
                                 else
@@ -510,6 +634,8 @@ namespace MaiFileManager.Classes
                         break;
                         }
                 }
+                OperatedFileListView.Remove(f);
+                OperatedPercent = (double)(OperatedFileList.Count - OperatedFileListView.Count) / OperatedFileList.Count;
             }
             await UpdateFileListAsync();
         }
