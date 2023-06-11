@@ -644,6 +644,11 @@ namespace MaiFileManager.Classes
         }
         internal async Task<bool> NewFolderAsync(string name)
         {
+            if (!IsValidFileName(name))
+            {
+                await Shell.Current.DisplayAlert("Invalid", "Invalid folder name, please choose another name", "OK");
+                return false;
+            }
             string path = Path.Combine(CurrentDirectoryInfo.CurrentDir, name);
             if (Directory.Exists(path))
             {
