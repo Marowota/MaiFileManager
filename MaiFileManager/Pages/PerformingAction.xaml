@@ -3,7 +3,8 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="MaiFileManager.Pages.PerformingAction"
              x:Name="PerformActionPage"
-             Title="PerformingAction">
+             Title="PerformingAction"
+             Padding="10,0">
     <Shell.TitleView>
         <Label  x:Name="lblAction"
                 Text="Action Name"
@@ -16,7 +17,7 @@
                 FontAttributes="Bold"
                 FontSize="Title"/>
     </Shell.TitleView>
-    <Grid RowDefinitions="20, 30, Auto, 30, *, Auto">
+    <Grid RowDefinitions="20, 30, Auto, 30, 30, *, 30, *, Auto">
         <Label  x:Name="lblType"
                 FontSize="Medium"
                 Text=""
@@ -41,50 +42,133 @@
                 VerticalOptions="CenterAndExpand"
                 FontAttributes="Bold"
                 Grid.Row="3"/>
-        <CollectionView x:Name="FileListView"
+        <Label  x:Name="lblInProgress"
+                Text="Processing"
+                Grid.Row="4"
+                HorizontalTextAlignment="Start"
+                VerticalTextAlignment="Center"
+                HorizontalOptions="StartAndExpand"
+                VerticalOptions="CenterAndExpand"
+                LineBreakMode="TailTruncation"
+                FontAttributes="Bold"
+                FontSize="Medium"/>
+        <Border StrokeThickness="1"
+                StrokeShape="RoundRectangle 5,5,5,5"
+                BackgroundColor="Transparent"
+                            Grid.Row="5">
+            <CollectionView x:Name="FileListView"
                             BindingContext="{x:Reference PerformActionPage}"
                             ItemsSource="{Binding currentFileListObj.OperatedFileListView}"
                             SelectionMode="Single"
-                            HorizontalScrollBarVisibility="Default"
-                            Grid.Row="4">
-            <CollectionView.ItemTemplate>
-                <DataTemplate>
-                    <Border StrokeThickness="1"
+                            HorizontalScrollBarVisibility="Default">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Border StrokeThickness="1"
                                     StrokeShape="RoundRectangle 5,5,5,5"
                                     Background="Transparent"
                                     Padding="12,8"
                                     Margin="0,1">
-                        <Grid Padding="10, 10">
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto" />
-                                <RowDefinition Height="Auto" />
-                            </Grid.RowDefinitions>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto"/>
-                                <ColumnDefinition Width="{Binding iconSize}" />
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="60" />
-                            </Grid.ColumnDefinitions>
-                            <Image Source="{Binding iconPath}" 
+                            <Grid Padding="10, 10">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="{Binding iconSize}" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="60" />
+                                </Grid.ColumnDefinitions>
+                                <Image Source="{Binding iconPath}" 
                                         Grid.Column="1"
                                         Grid.RowSpan="2"
                                         Margin="0,0,10,0"/>
-                            <Label Grid.Column="2"
+                                <Label Grid.Column="2"
                                         Text="{Binding fileInfo.Name}"
                                         FontAttributes="Bold" />
-                            <Label Grid.Column="3"
+                                <Label Grid.Column="3"
                                         Text="{Binding fileInfoSize}"
                                         FontAttributes="Bold" 
                                         HorizontalOptions="EndAndExpand"/>
-                            <Label Grid.Row="1"
+                                <Label Grid.Row="1"
                                         Grid.Column="2"
                                         Grid.ColumnSpan="2"
                                         Text="{Binding lastModified}"
                                         VerticalOptions="End" />
-                        </Grid>
-                    </Border>
-                </DataTemplate>
-            </CollectionView.ItemTemplate>
-        </CollectionView>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </Border>
+        <Label  x:Name="lblCompleted"
+                Text="Completed"
+                Grid.Row="6"
+                HorizontalTextAlignment="Start"
+                VerticalTextAlignment="Center"
+                HorizontalOptions="StartAndExpand"
+                VerticalOptions="CenterAndExpand"
+                LineBreakMode="TailTruncation"
+                FontAttributes="Bold"
+                FontSize="Medium"/>
+        <Border StrokeThickness="1"
+                StrokeShape="RoundRectangle 5,5,5,5"
+                BackgroundColor="Transparent"
+                            Grid.Row="7">
+            <CollectionView x:Name="FileCompleteView"
+                            BindingContext="{x:Reference PerformActionPage}"
+                            ItemsSource="{Binding currentFileListObj.OperatedCompletedListView}"
+                            SelectionMode="Single"
+                            HorizontalScrollBarVisibility="Default">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Border StrokeThickness="1"
+                                    StrokeShape="RoundRectangle 5,5,5,5"
+                                    Background="Transparent"
+                                    Padding="12,8"
+                                    Margin="0,1">
+                            <Grid Padding="10, 10">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="{Binding iconSize}" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="60" />
+                                </Grid.ColumnDefinitions>
+                                <Image Source="{Binding iconPath}" 
+                                        Grid.Column="1"
+                                        Grid.RowSpan="2"
+                                        Margin="0,0,10,0"/>
+                                <Label Grid.Column="2"
+                                        Text="{Binding fileInfo.Name}"
+                                        FontAttributes="Bold" />
+                                <Label Grid.Column="3"
+                                        Text="{Binding fileInfoSize}"
+                                        FontAttributes="Bold" 
+                                        HorizontalOptions="EndAndExpand"/>
+                                <Label Grid.Row="1"
+                                        Grid.Column="2"
+                                        Grid.ColumnSpan="2"
+                                        Text="{Binding lastModified}"
+                                        VerticalOptions="End" />
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </Border>
+        <Button x:Name="ActionButton"
+                Grid.Row="8"
+                HorizontalOptions="Fill"
+                VerticalOptions="CenterAndExpand"
+                Margin="0,10"
+                Clicked="ActionButton_Clicked"
+                Text="Back"
+                IsEnabled="False">
+            
+        </Button>
     </Grid>
 </ContentPage>

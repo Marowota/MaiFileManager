@@ -16,11 +16,12 @@ public partial class PerformingAction : ContentPage
 
     public FileList currentFileListObj { get; set; } = null;
     ActionType curretAt { get; set; }
-    System.Timers.Timer t = new System.Timers.Timer(500);
+    System.Timers.Timer t = new System.Timers.Timer(400);
+    bool IsCompleted { get; set; } = false;
 
     public PerformingAction()
     {
-        InitializeComponent();
+        InitializeComponent(); 
         t.Elapsed += T_Elapsed;
         t.Start();
     }
@@ -61,12 +62,35 @@ public partial class PerformingAction : ContentPage
                 await this.Dispatcher.DispatchAsync(() => {
                     lblType.Text = "Deleting...";
                 });
-                await currentFileListObj.DeleteModeAsync(); 
+                    int result = await currentFileListObj.DeleteModeAsync(); 
                 await this.Dispatcher.DispatchAsync(() => {
-                    lblType.Text = "Deleted";
+                    if (result == 0)
+                    {
+                        lblType.Text = "Did nothing!";
+                    }
+                    if (result == 1)
+                    {
+                        lblType.Text = "Deleted";
+                    }
                 });
                 break;
         }
         currentFileListObj.NavigatedPage = null;
+        await this.Dispatcher.DispatchAsync(() =>
+        {
+            ActionButton.IsEnabled = true;
+        });
+    }
+    protected override bool OnBackButtonPressed()
+    {
+        if (IsCompleted)
+        {
+            return base.OnBackButtonPressed();
+        }
+        return true;
+    }
+    private async void ActionButton_Clicked(object sender, EventArgs e)
+    {
+        await Navigation.PopModalAsync();
     }
 }

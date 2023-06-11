@@ -43,7 +43,9 @@ namespace MaiFileManager.Classes
         private bool isReloading = true;
         public FileSortMode SortMode = (FileSortMode)Preferences.Default.Get("Sort_by", 0);
         System.Timers.Timer delayTime = new System.Timers.Timer(500);
-        public ObservableCollection<FileSystemInfoWithIcon> OperatedFileListView { get; set; } = new ObservableCollection<FileSystemInfoWithIcon>();
+        public ObservableCollection<FileSystemInfoWithIcon> OperatedFileListView { get; set; } = new ObservableCollection<FileSystemInfoWithIcon>(); 
+        public ObservableCollection<FileSystemInfoWithIcon> OperatedCompletedListView { get; set; } = new ObservableCollection<FileSystemInfoWithIcon>();
+
         public List<FileSystemInfoWithIcon> PendingOperatedFileListView = new List<FileSystemInfoWithIcon> ();
         private double operatedPercent = 0;
         private string operatedStatusString = "";
@@ -435,18 +437,22 @@ namespace MaiFileManager.Classes
             }
         }
 
-        internal async Task DeleteModeAsync()
+        internal async Task<int> DeleteModeAsync()
         {
             OperatedFileList.Clear();
             OperatedFileListView.Clear();
+            OperatedCompletedListView.Clear();
+            int noFIle = 1;
             foreach (FileSystemInfoWithIcon f in CurrentFileList)
             {
                 if (f.CheckBoxSelected)
                 {
+                    noFIle = 0;
                     OperatedFileList.Add(f);
                     OperatedFileListView.Add(f);
                 }
             }
+            if (noFIle == 1) return 0;
             OperatedPercent = 0;
             int tmpInit = OperatedFileListView.Count;
             int tmpDone = 0;
@@ -462,13 +468,15 @@ namespace MaiFileManager.Classes
                     {
                         (f.fileInfo as DirectoryInfo).Delete(true);
                     }
+                    tmpDone++;
+                    OperatedFileListView.Remove(f);
+                    OperatedCompletedListView.Add(f);
+                    OperatedPercent = (double)tmpDone / tmpInit;
                 }
-                tmpDone++;
-                OperatedFileListView.Remove(f);
-                OperatedPercent = (double)tmpDone / tmpInit;
             }
             await UpdateFileListAsync();
             OperatedFileList.Clear();
+            return 1;
         }
         internal async Task RenameModeAsync(string path, string newName)
         {
@@ -520,6 +528,7 @@ namespace MaiFileManager.Classes
         internal async Task PasteModeAsync()
         {
             OperatedFileListView.Clear();
+            OperatedCompletedListView.Clear();
             foreach (FileSystemInfoWithIcon f in OperatedFileList)
             {
                 OperatedFileListView.Add(f);
@@ -638,6 +647,7 @@ namespace MaiFileManager.Classes
                         }
                 }
                 OperatedFileListView.Remove(f);
+                OperatedCompletedListView.Add(f);
                 OperatedPercent = (double)(OperatedFileList.Count - OperatedFileListView.Count) / OperatedFileList.Count;
             }
             await UpdateFileListAsync();
