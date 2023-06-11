@@ -17,6 +17,20 @@ public partial class PerformingAction : ContentPage
     public FileList currentFileListObj { get; set; } = null;
     ActionType curretAt { get; set; }
     System.Timers.Timer t = new System.Timers.Timer(400);
+    private FileSystemInfoWithIcon currentProcessingFile;
+    public FileSystemInfoWithIcon CurrentProcessingFile
+    {
+        get
+        {
+            return currentProcessingFile;
+        }
+        set
+        {
+            OnPropertyChanging(nameof(CurrentProcessingFile));
+            currentProcessingFile = value;
+            OnPropertyChanged(nameof(CurrentProcessingFile));
+        }
+    }
     bool IsCompleted { get; set; } = false;
 
     public PerformingAction()
@@ -43,6 +57,9 @@ public partial class PerformingAction : ContentPage
         {
             return;
         }
+        System.Timers.Timer reloadTimer = new System.Timers.Timer(300);
+        reloadTimer.Elapsed += ReloadTimer_Elapsed;
+        reloadTimer.Start();
         switch (curretAt)
         {
             case ActionType.paste:
@@ -75,12 +92,21 @@ public partial class PerformingAction : ContentPage
                 });
                 break;
         }
+        reloadTimer.Stop();
+        gridProcessing.IsVisible = false;
         currentFileListObj.NavigatedPage = null;
+        currentProcessingFile = null;
         await this.Dispatcher.DispatchAsync(() =>
         {
             ActionButton.IsEnabled = true;
         });
     }
+
+    private void ReloadTimer_Elapsed(object sender, ElapsedEventArgs e)
+    {
+        CurrentProcessingFile = currentFileListObj.OperatedFileListView.FirstOrDefault();
+    }
+
     protected override bool OnBackButtonPressed()
     {
         if (IsCompleted)

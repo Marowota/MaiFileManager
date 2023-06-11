@@ -44,9 +44,9 @@ namespace MaiFileManager.Classes
         public FileSortMode SortMode = (FileSortMode)Preferences.Default.Get("Sort_by", 0);
         System.Timers.Timer delayTime = new System.Timers.Timer(500);
         public ObservableCollection<FileSystemInfoWithIcon> OperatedFileListView { get; set; } = new ObservableCollection<FileSystemInfoWithIcon>(); 
-        public ObservableCollection<FileSystemInfoWithIcon> OperatedCompletedListView { get; set; } = new ObservableCollection<FileSystemInfoWithIcon>();
+        public ObservableCollection<FileSystemInfoWithIcon> OperatedCompletedListView { get; set; } = new ObservableCollection<FileSystemInfoWithIcon>(); 
+        public ObservableCollection<FileSystemInfoWithIcon> OperatedErrorListView { get; set; } = new ObservableCollection<FileSystemInfoWithIcon>();
 
-        public List<FileSystemInfoWithIcon> PendingOperatedFileListView = new List<FileSystemInfoWithIcon> ();
         private double operatedPercent = 0;
         private string operatedStatusString = "";
         public Page NavigatedPage = null;
@@ -442,6 +442,7 @@ namespace MaiFileManager.Classes
             OperatedFileList.Clear();
             OperatedFileListView.Clear();
             OperatedCompletedListView.Clear();
+            OperatedErrorListView.Clear();
             int noFIle = 1;
             foreach (FileSystemInfoWithIcon f in CurrentFileList)
             {
@@ -529,6 +530,7 @@ namespace MaiFileManager.Classes
         {
             OperatedFileListView.Clear();
             OperatedCompletedListView.Clear();
+            OperatedErrorListView.Clear();
             foreach (FileSystemInfoWithIcon f in OperatedFileList)
             {
                 OperatedFileListView.Add(f);
@@ -577,6 +579,8 @@ namespace MaiFileManager.Classes
                                         tmp = NavigatedPage;
                                     }
                                     await tmp.Dispatcher.DispatchAsync(async () => { await tmp.DisplayAlert("Error", f.fileInfo.Name + "\nCannot cut to itself", "OK"); });
+                                    OperatedFileListView.Remove(f);
+                                    OperatedErrorListView.Add(f);
                                     continue;
                                 }
                                 if (Directory.Exists(targetFilePath))
@@ -591,6 +595,8 @@ namespace MaiFileManager.Classes
                                         tmp = NavigatedPage;
                                     }
                                     await tmp.Dispatcher.DispatchAsync(async () => { await tmp.DisplayAlert("Error", f.fileInfo.Name + "\nDirectory with same name already exists", "OK"); });
+                                    OperatedFileListView.Remove(f);
+                                    OperatedErrorListView.Add(f);
                                     continue;
                                 }
                                 (f.fileInfo as DirectoryInfo).MoveTo(targetFilePath);
@@ -636,6 +642,8 @@ namespace MaiFileManager.Classes
                                         tmp = NavigatedPage;
                                     }
                                     await tmp.Dispatcher.DispatchAsync(async () => { await tmp.DisplayAlert("Error", f.fileInfo.Name + "\nCannot copy to itself", "OK"); });
+                                    OperatedFileListView.Remove(f);
+                                    OperatedErrorListView.Add(f);
                                     continue;
                                 }
                                 else
