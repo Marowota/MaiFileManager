@@ -94,6 +94,7 @@ public partial class PerformingAction : ContentPage
         }
         reloadTimer.Stop();
         gridProcessing.IsVisible = false;
+        currentFileListObj.OperatedOption = FileList.FileSelectOption.None;
         currentFileListObj.NavigatedPage = null;
         currentProcessingFile = null;
         await this.Dispatcher.DispatchAsync(() =>

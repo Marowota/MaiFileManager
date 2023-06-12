@@ -134,7 +134,7 @@ namespace MaiFileManager.Classes
             {
                 return;
             }
-            Device.BeginInvokeOnMainThread(OnLongPressed);
+            Shell.Current.CurrentPage.Dispatcher.Dispatch(OnLongPressed);
         }
     }
 }
