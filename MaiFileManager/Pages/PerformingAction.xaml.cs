@@ -99,6 +99,18 @@ public partial class PerformingAction : ContentPage
         await this.Dispatcher.DispatchAsync(() =>
         {
             ActionButton.IsEnabled = true;
+            switch (Application.Current.RequestedTheme)
+            {
+                case AppTheme.Unspecified:
+                    ActionButton.Background = Color.FromRgb(81, 43, 212);
+                    break;
+                case AppTheme.Light:
+                    ActionButton.Background = Color.FromRgb(81, 43, 212);
+                    break;
+                case AppTheme.Dark:
+                    ActionButton.Background = Colors.White;
+                    break;
+            }
         });
     }
 

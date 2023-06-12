@@ -453,10 +453,10 @@ namespace MaiFileManager.Classes
                     OperatedFileListView.Add(f);
                 }
             }
-            if (noFIle == 1) return 0;
             OperatedPercent = 0;
             int tmpInit = OperatedFileListView.Count;
             int tmpDone = 0;
+            if (noFIle == 1) return 0;
             foreach (FileSystemInfoWithIcon f in CurrentFileList)
             {
                 if (f.CheckBoxSelected)
@@ -581,6 +581,7 @@ namespace MaiFileManager.Classes
                                     await tmp.Dispatcher.DispatchAsync(async () => { await tmp.DisplayAlert("Error", f.fileInfo.Name + "\nCannot cut to itself", "OK"); });
                                     OperatedFileListView.Remove(f);
                                     OperatedErrorListView.Add(f);
+                                    OperatedPercent = (double)(OperatedFileList.Count - OperatedFileListView.Count) / OperatedFileList.Count;
                                     continue;
                                 }
                                 if (Directory.Exists(targetFilePath))
@@ -597,6 +598,7 @@ namespace MaiFileManager.Classes
                                     await tmp.Dispatcher.DispatchAsync(async () => { await tmp.DisplayAlert("Error", f.fileInfo.Name + "\nDirectory with same name already exists", "OK"); });
                                     OperatedFileListView.Remove(f);
                                     OperatedErrorListView.Add(f);
+                                    OperatedPercent = (double)(OperatedFileList.Count - OperatedFileListView.Count) / OperatedFileList.Count;
                                     continue;
                                 }
                                 (f.fileInfo as DirectoryInfo).MoveTo(targetFilePath);
@@ -644,6 +646,7 @@ namespace MaiFileManager.Classes
                                     await tmp.Dispatcher.DispatchAsync(async () => { await tmp.DisplayAlert("Error", f.fileInfo.Name + "\nCannot copy to itself", "OK"); });
                                     OperatedFileListView.Remove(f);
                                     OperatedErrorListView.Add(f);
+                                    OperatedPercent = (double)(OperatedFileList.Count - OperatedFileListView.Count) / OperatedFileList.Count;
                                     continue;
                                 }
                                 else

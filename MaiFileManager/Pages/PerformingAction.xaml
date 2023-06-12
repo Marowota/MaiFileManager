@@ -106,6 +106,7 @@
             <CollectionView x:Name="FileCompleteView"
                             BindingContext="{x:Reference PerformActionPage}"
                             ItemsSource="{Binding currentFileListObj.OperatedCompletedListView}"
+                            
                             SelectionMode="Single"
                             HorizontalScrollBarVisibility="Default">
                 <CollectionView.ItemTemplate>
@@ -215,7 +216,6 @@
                 Clicked="ActionButton_Clicked"
                 Text="Back"
                 IsEnabled="False">
-            
         </Button>
     </Grid>
 </ContentPage>
