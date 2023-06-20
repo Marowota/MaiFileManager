@@ -15,6 +15,7 @@ public partial class HomePage : ContentPage
     bool FirstLoad = true;
     bool IsSearched { get; set; } = false;
     bool IsNavigated { get; set; } = false;
+
     public HomePage()
     {
         FileListObj = new FileList();
@@ -64,6 +65,7 @@ public partial class HomePage : ContentPage
         foreach (FileSystemInfoWithIcon f in FileListObj.CurrentFileList)
         {
             f.CheckBoxSelectVisible = value;
+            f.GridFileListViewPadding = value ? new Thickness(0, 8) : new Thickness(12, 8);
         }
         CancleMultipleSelection.IsVisible = value;
         SelectAllChk.IsVisible = value;

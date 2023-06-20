@@ -7,6 +7,11 @@ public partial class Setting : ContentPage
 	public Setting()
 	{
 		InitializeComponent();
+        InitLoad();
+	}
+
+    void InitLoad()
+    {
         int rd = Preferences.Default.Get("Sort_by", 0);
         int theme = Preferences.Default.Get("Theme", 0);
         switch (theme)
@@ -26,16 +31,18 @@ public partial class Setting : ContentPage
             case 6: DateNO.IsChecked = true; break;
             case 7: DateON.IsChecked = true; break;
         }
-	}
-
+    }
 
     private void DefaultRd_CheckedChanged(object sender, CheckedChangedEventArgs e)
     {
         if ((sender as RadioButton).IsChecked)
         {
-
             Preferences.Default.Set("Theme", 0);
             Application.Current.UserAppTheme = AppTheme.Unspecified;
+#if ANDROID
+            AndroidX.AppCompat.App.AppCompatDelegate.DefaultNightMode = AndroidX.AppCompat.App.AppCompatDelegate.ModeNightFollowSystem;
+#endif
+            this.InvalidateMeasure();
         }
     }
 
@@ -45,6 +52,10 @@ public partial class Setting : ContentPage
         {
             Preferences.Default.Set("Theme", 1);
             Application.Current.UserAppTheme = AppTheme.Light;
+#if ANDROID
+            AndroidX.AppCompat.App.AppCompatDelegate.DefaultNightMode = AndroidX.AppCompat.App.AppCompatDelegate.ModeNightNo;
+#endif
+            this.InvalidateMeasure();
         }
     }
 
@@ -54,6 +65,10 @@ public partial class Setting : ContentPage
         {
             Preferences.Default.Set("Theme", 2);
             Application.Current.UserAppTheme = AppTheme.Dark;
+#if ANDROID
+            AndroidX.AppCompat.App.AppCompatDelegate.DefaultNightMode = AndroidX.AppCompat.App.AppCompatDelegate.ModeNightYes;
+#endif
+            this.InvalidateMeasure();
         }
     }
 

@@ -9,9 +9,9 @@
                       Icon="sfolder.png"
                       Title="Files"
                       ContentTemplate="{DataTemplate pages:HomePage}"/>
-        <!--<ShellContent Icon="heart.png"
+        <ShellContent Icon="heart.png"
                       Title="Favourite"
-                      ContentTemplate="{DataTemplate pages:Favourite}"/>-->
+                      ContentTemplate="{DataTemplate pages:Favourite}"/>
         <ShellContent Icon="download.png"
                       Title="Downloaded">
             <ShellContent.ContentTemplate>
@@ -27,7 +27,7 @@
         <ShellContent Icon="settings.png"
                       Title="Settings"
                       ContentTemplate="{DataTemplate pages:Setting}"/>
-        <ShellContent Title="Devonly"
-                      ContentTemplate="{DataTemplate pages:Devonly}"/>
+        <!--<ShellContent Title="Devonly"
+                      ContentTemplate="{DataTemplate pages:Devonly}"/>-->
     </TabBar>
 </Shell>

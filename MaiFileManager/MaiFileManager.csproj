@@ -47,6 +47,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <None Remove="Platforms\Android\Resources\values-night\colors.xml" />
 	  <None Remove="Resources\AppIcon\appicon.png" />
 	  <None Remove="Resources\Images\back.png" />
 	  <None Remove="Resources\Images\cancel.png" />

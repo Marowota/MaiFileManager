@@ -37,6 +37,19 @@ namespace MaiFileManager.Classes
                 OnPropertyChanged(nameof(CheckBoxSelected));
             }
         }
+        Thickness gridFileListViewPadding;
+        public Thickness GridFileListViewPadding
+        {
+            get
+            {
+                return gridFileListViewPadding;
+            }
+            set
+            {
+                gridFileListViewPadding = value;
+                OnPropertyChanged(nameof(GridFileListViewPadding));
+            }
+        }
         public event PropertyChangedEventHandler PropertyChanged;
 
         public void OnPropertyChanged([CallerMemberName] string name = "") =>
@@ -46,6 +59,7 @@ namespace MaiFileManager.Classes
             fileInfo = fileData;
             iconPath = iconPathData;
             iconSize = iconSizeData;
+            gridFileListViewPadding = new Thickness(12, 8);
             ConvertFileInfoSize();
             ConvertFileLastModified();
             

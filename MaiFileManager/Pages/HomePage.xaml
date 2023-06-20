@@ -124,7 +124,7 @@
                 <CheckBox x:Name="SelectAllChk"
                           Grid.Column="0"
                           HorizontalOptions="Start"
-                          Margin="22,5,5,5"
+                          Margin="10,5,5,5"
                           VerticalOptions="CenterAndExpand"
                           HeightRequest="50"
                           CheckedChanged="SelectAllChk_CheckedChanged"/>
@@ -187,7 +187,7 @@
                             <Border StrokeThickness="1"
                                     StrokeShape="RoundRectangle 5,5,5,5"
                                     Background="Transparent"
-                                    Padding="12,8"
+                                    Padding="{Binding GridFileListViewPadding}"
                                     Margin="0,1">
                                 <SwipeView SwipeStarted="Rename_SwipeStarted"
                                            Grid.Row="1">
