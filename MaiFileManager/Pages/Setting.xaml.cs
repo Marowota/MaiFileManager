@@ -4,6 +4,7 @@ namespace MaiFileManager.Pages;
 
 public partial class Setting : ContentPage
 {
+    private bool IsFirstLoad = false;
 	public Setting()
 	{
 		InitializeComponent();
@@ -14,6 +15,7 @@ public partial class Setting : ContentPage
     {
         int rd = Preferences.Default.Get("Sort_by", 0);
         int theme = Preferences.Default.Get("Theme", 0);
+        IsFirstLoad = true;
         switch (theme)
         {
             case 0: DefaultRd.IsChecked = true; break;
@@ -33,42 +35,84 @@ public partial class Setting : ContentPage
         }
     }
 
-    private void DefaultRd_CheckedChanged(object sender, CheckedChangedEventArgs e)
+    private async void DefaultRd_CheckedChanged(object sender, CheckedChangedEventArgs e)
     {
         if ((sender as RadioButton).IsChecked)
         {
+            if (!IsFirstLoad)
+            {
+                bool allow = await DisplayAlert("Theme change", "The application must restart to apply theme change, continue?", "OK", "Cancel");
+                if (!allow)
+                {
+                    InitLoad();
+                    IsFirstLoad = false;
+                    return;
+                }
+            }
             Preferences.Default.Set("Theme", 0);
             Application.Current.UserAppTheme = AppTheme.Unspecified;
 #if ANDROID
             AndroidX.AppCompat.App.AppCompatDelegate.DefaultNightMode = AndroidX.AppCompat.App.AppCompatDelegate.ModeNightFollowSystem;
 #endif
-            this.InvalidateMeasure();
+            if (!IsFirstLoad)
+            {
+                Application.Current.MainPage = new AppShell();
+            }
+            IsFirstLoad = false;
         }
     }
 
-    private void LightRd_CheckedChanged(object sender, CheckedChangedEventArgs e)
+    private async void LightRd_CheckedChanged(object sender, CheckedChangedEventArgs e)
     {
         if ((sender as RadioButton).IsChecked)
         {
+            if (!IsFirstLoad)
+            {
+                bool allow = await DisplayAlert("Theme change", "The application must restart to apply theme change, continue?", "OK", "Cancel");
+                if (!allow)
+                {
+                    InitLoad();
+                    IsFirstLoad = false;
+                    return;
+                }
+            }
             Preferences.Default.Set("Theme", 1);
             Application.Current.UserAppTheme = AppTheme.Light;
 #if ANDROID
             AndroidX.AppCompat.App.AppCompatDelegate.DefaultNightMode = AndroidX.AppCompat.App.AppCompatDelegate.ModeNightNo;
 #endif
-            this.InvalidateMeasure();
+            if (!IsFirstLoad)
+            {
+                Application.Current.MainPage = new AppShell();
+            }
+            IsFirstLoad = false;
         }
     }
 
-    private void DarkRd_CheckedChanged(object sender, CheckedChangedEventArgs e)
+    private async void DarkRd_CheckedChanged(object sender, CheckedChangedEventArgs e)
     {
         if ((sender as RadioButton).IsChecked)
         {
+            if (!IsFirstLoad)
+            {
+                bool allow = await DisplayAlert("Theme change", "The application must restart to apply theme change, continue?", "OK", "Cancel");
+                if (!allow)
+                {
+                    InitLoad();
+                    IsFirstLoad = false;
+                    return;
+                }
+            }
             Preferences.Default.Set("Theme", 2);
             Application.Current.UserAppTheme = AppTheme.Dark;
 #if ANDROID
             AndroidX.AppCompat.App.AppCompatDelegate.DefaultNightMode = AndroidX.AppCompat.App.AppCompatDelegate.ModeNightYes;
 #endif
-            this.InvalidateMeasure();
+            if (!IsFirstLoad)
+            {
+                Application.Current.MainPage = new AppShell();
+            }
+            IsFirstLoad = false;
         }
     }
 
@@ -111,4 +155,6 @@ public partial class Setting : ContentPage
     {
         Preferences.Default.Set("Sort_by", 7);
     }
+
+
 }
