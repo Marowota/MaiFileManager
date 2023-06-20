@@ -231,7 +231,18 @@ public partial class HomePage : ContentPage
         }
         if (result != null)
         {
-            await FileListObj.RenameModeAsync(path, result);
+            await FileListObj.RenameModeAsync(path, result); 
+            if (!IsSearched)
+            {
+                await Task.Run(FileListObj.UpdateFileListAsync);
+            }
+            else
+            {
+                if (SearchBarFile.IsVisible)
+                {
+                    SearchBarFile_SearchButtonPressed(SearchBarFile, null);
+                }
+            }
         }    
         (sender as SwipeView).Close(false);
     }

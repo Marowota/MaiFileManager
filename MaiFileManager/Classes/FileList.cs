@@ -544,7 +544,6 @@ namespace MaiFileManager.Classes
 
                 File.Move(path, newPath);
             }
-            await UpdateFileListAsync();
         }
         internal async Task PasteModeAsync()
         {
