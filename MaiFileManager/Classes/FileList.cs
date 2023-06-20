@@ -402,7 +402,25 @@ namespace MaiFileManager.Classes
         async Task<bool> ArletForExisted(string dir, string dirName)
         {
             bool result = false;
-            if (File.Exists(dir))
+            if (Directory.Exists(dir))
+            {
+                Page tmp;
+                if (NavigatedPage == null)
+                {
+                    tmp = Shell.Current.CurrentPage;
+                }
+                else
+                {
+                    tmp = NavigatedPage;
+                }
+                await tmp.Dispatcher.DispatchAsync(async () => {
+                    await tmp.DisplayAlert("Existed", "Folder "
+                                                                + dirName
+                                                                + "already exists in this directory\n" ,"OK");
+                    result = false;
+                });
+            }
+            else if (File.Exists(dir))
             {
                 Page tmp;
                 if (NavigatedPage == null)
@@ -484,7 +502,7 @@ namespace MaiFileManager.Classes
             if (Directory.Exists(path))
             {
                 string newPath = Path.Combine(Directory.GetParent(path).FullName, newName);
-                if (Directory.Exists(newPath))
+                if (Directory.Exists(newPath) || File.Exists(newPath))
                 {
                     Page tmp;
                     if (NavigatedPage == null)
@@ -497,7 +515,7 @@ namespace MaiFileManager.Classes
                     }
                     //maybe dont need
                     await tmp.Dispatcher.DispatchAsync(async () => {
-                        await tmp.DisplayAlert("Duplicated", "Duplicate folder name, please choose another name", "OK");
+                        await tmp.DisplayAlert("Duplicated", "Duplicate file/folder name, please choose another name", "OK");
                     });
                     return;
                 }
@@ -506,7 +524,7 @@ namespace MaiFileManager.Classes
             else if (File.Exists(path))
             {
                 string newPath = Path.Combine(Directory.GetParent(path).FullName, newName) + Path.GetExtension(path);
-                if (File.Exists(newPath))
+                if (Directory.Exists(newPath) || File.Exists(newPath))
                 {
                     Page tmp;
                     if (NavigatedPage == null)
@@ -518,7 +536,9 @@ namespace MaiFileManager.Classes
                         tmp = NavigatedPage;
                     }
                     //maybe dont need
-                    await tmp.Dispatcher.DispatchAsync(async () => { await tmp.DisplayAlert("Duplicated", "Duplicate file name, please choose another name", "OK"); });
+                    await tmp.Dispatcher.DispatchAsync(async () => {
+                        await tmp.DisplayAlert("Duplicated", "Duplicate file/folder name, please choose another name", "OK");
+                    });
                     return;
                 }
 
@@ -545,7 +565,7 @@ namespace MaiFileManager.Classes
                             if (f.fileInfo.GetType() == typeof(FileInfo))
                             {
                                 string targetFilePath = Path.Combine(CurrentDirectoryInfo.CurrentDir, f.fileInfo.Name);
-                                if (File.Exists(targetFilePath))
+                                if (File.Exists(targetFilePath) || Directory.Exists(targetFilePath))
                                 {
                                     if (await ArletForExisted(targetFilePath, f.fileInfo.Name))
                                     {
@@ -557,6 +577,13 @@ namespace MaiFileManager.Classes
                                     (f.fileInfo as FileInfo).MoveTo(string.Format("{0}{1}", targetFilePath, num));
                                         File.Delete(targetFilePath);
                                         File.Move(string.Format("{0}{1}", targetFilePath, num), targetFilePath);
+                                    }
+                                    else
+                                    {
+                                        OperatedFileListView.Remove(f);
+                                        OperatedErrorListView.Add(f);
+                                        OperatedPercent = (double)(OperatedFileList.Count - OperatedFileListView.Count) / OperatedFileList.Count;
+                                        continue;
                                     }
                                 }
                                 else
@@ -584,7 +611,7 @@ namespace MaiFileManager.Classes
                                     OperatedPercent = (double)(OperatedFileList.Count - OperatedFileListView.Count) / OperatedFileList.Count;
                                     continue;
                                 }
-                                if (Directory.Exists(targetFilePath))
+                                if (Directory.Exists(targetFilePath) || File.Exists(targetFilePath))
                                 {
                                     Page tmp;
                                     if (NavigatedPage == null)
@@ -595,7 +622,7 @@ namespace MaiFileManager.Classes
                                     {
                                         tmp = NavigatedPage;
                                     }
-                                    await tmp.Dispatcher.DispatchAsync(async () => { await tmp.DisplayAlert("Error", f.fileInfo.Name + "\nDirectory with same name already exists", "OK"); });
+                                    await tmp.Dispatcher.DispatchAsync(async () => { await tmp.DisplayAlert("Error", f.fileInfo.Name + "\nDirectory/File with same name already exists", "OK"); });
                                     OperatedFileListView.Remove(f);
                                     OperatedErrorListView.Add(f);
                                     OperatedPercent = (double)(OperatedFileList.Count - OperatedFileListView.Count) / OperatedFileList.Count;
@@ -610,7 +637,7 @@ namespace MaiFileManager.Classes
                             if (f.fileInfo.GetType() == typeof(FileInfo))
                             {
                                 string targetFilePath = Path.Combine(CurrentDirectoryInfo.CurrentDir, f.fileInfo.Name);
-                                if (File.Exists(targetFilePath))
+                                if (File.Exists(targetFilePath) || Directory.Exists(targetFilePath))
                                 {
                                     if (await ArletForExisted(targetFilePath, f.fileInfo.Name))
                                     {
@@ -622,6 +649,13 @@ namespace MaiFileManager.Classes
                                     (f.fileInfo as FileInfo).CopyTo(string.Format("{0}{1}", targetFilePath, num));
                                         File.Delete(targetFilePath);
                                         File.Move(string.Format("{0}{1}", targetFilePath, num), targetFilePath);
+                                    }
+                                    else
+                                    {
+                                        OperatedFileListView.Remove(f);
+                                        OperatedErrorListView.Add(f);
+                                        OperatedPercent = (double)(OperatedFileList.Count - OperatedFileListView.Count) / OperatedFileList.Count;
+                                        continue;
                                     }
                                 }
                                 else
@@ -651,6 +685,24 @@ namespace MaiFileManager.Classes
                                 }
                                 else
                                 {
+                                    string targetFilePath = Path.Combine(CurrentDirectoryInfo.CurrentDir, f.fileInfo.Name);
+                                    if (File.Exists(targetFilePath))
+                                    {
+                                        Page tmp;
+                                        if (NavigatedPage == null)
+                                        {
+                                            tmp = Shell.Current.CurrentPage;
+                                        }
+                                        else
+                                        {
+                                            tmp = NavigatedPage;
+                                        }
+                                        await tmp.Dispatcher.DispatchAsync(async () => { await tmp.DisplayAlert("Error", f.fileInfo.Name + "\nDirectory/File with same name already exists", "OK"); });
+                                        OperatedFileListView.Remove(f);
+                                        OperatedErrorListView.Add(f);
+                                        OperatedPercent = (double)(OperatedFileList.Count - OperatedFileListView.Count) / OperatedFileList.Count;
+                                        continue;
+                                    }
                                     CopyDirectory((f.fileInfo as DirectoryInfo), CurrentDirectoryInfo.CurrentDir);
                                 }
                             }
@@ -674,7 +726,12 @@ namespace MaiFileManager.Classes
             if (Directory.Exists(path))
             {
                 await Shell.Current.DisplayAlert("Duplicated", "Duplicate folder name, please choose another name", "OK");
-                return false; 
+                return false;
+            }
+            if (File.Exists(path))
+            {
+                await Shell.Current.DisplayAlert("Duplicated", "Duplicate with another file name, please choose another name", "OK");
+                return false;
             }
             Directory.CreateDirectory(path);
             await UpdateFileListAsync();
