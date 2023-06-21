@@ -848,7 +848,6 @@ namespace MaiFileManager.Classes
             List<string> oldFolderList = new List<string>();
             if (!File.Exists(FavouriteFilePath))
             {
-                File.Create(FavouriteFilePath);
                 oldFileList.Clear();
             }
             else
@@ -858,7 +857,6 @@ namespace MaiFileManager.Classes
 
             if (!File.Exists(FavouriteFolderPath))
             {
-                File.Create(FavouriteFolderPath);
                 oldFolderList.Clear();
             }
             else
