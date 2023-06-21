@@ -24,6 +24,7 @@ namespace MaiFileManager.Classes
             set
             {
                 checkBoxSelectVisible = value;
+                GridFileListViewPadding = value ? new Thickness(0, 8) : new Thickness(12, 8);
                 OnPropertyChanged(nameof(CheckBoxSelectVisible));
             }
         }

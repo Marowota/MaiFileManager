@@ -65,7 +65,6 @@ public partial class HomePage : ContentPage
         foreach (FileSystemInfoWithIcon f in FileListObj.CurrentFileList)
         {
             f.CheckBoxSelectVisible = value;
-            f.GridFileListViewPadding = value ? new Thickness(0, 8) : new Thickness(12, 8);
         }
         CancleMultipleSelection.IsVisible = value;
         SelectAllChk.IsVisible = value;
