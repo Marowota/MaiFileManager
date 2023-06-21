@@ -49,6 +49,7 @@
 	<ItemGroup>
 	  <None Remove="Platforms\Android\Resources\values-night\colors.xml" />
 	  <None Remove="Resources\AppIcon\appicon.png" />
+	  <None Remove="Resources\Images\addfav.png" />
 	  <None Remove="Resources\Images\back.png" />
 	  <None Remove="Resources\Images\cancel.png" />
 	  <None Remove="Resources\Images\copy.png" />
@@ -57,6 +58,7 @@
 	  <None Remove="Resources\Images\darkmove.png" />
 	  <None Remove="Resources\Images\darkpaste.png" />
 	  <None Remove="Resources\Images\delete.png" />
+	  <None Remove="Resources\Images\delfav.png" />
 	  <None Remove="Resources\Images\download.png" />
 	  <None Remove="Resources\Images\folder.png" />
 	  <None Remove="Resources\Images\heart.png" />

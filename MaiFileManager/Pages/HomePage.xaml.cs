@@ -15,7 +15,30 @@ public partial class HomePage : ContentPage
     bool FirstLoad = true;
     bool IsSearched { get; set; } = false;
     bool IsNavigated { get; set; } = false;
-
+    bool IsFavouriteMode { get; set; } = false;
+    bool IsFavouriteVisible { get; set; } = false;
+    public bool IsAddFavouriteVisible
+    {
+        get
+        {
+            if (IsFavouriteVisible)
+            {
+                if (IsFavouriteMode)
+                {
+                    return false;
+                }
+                else
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+        set
+        {
+            return;
+        }
+    }
     public HomePage()
     {
         FileListObj = new FileList();
@@ -344,5 +367,19 @@ public partial class HomePage : ContentPage
         if (asResult == "Cancel" || asResult == null) return;
         FileListObj.SortMode = (FileList.FileSortMode)sortby.ToList().IndexOf(asResult);
         await FileListObj.UpdateFileListAsync();
+    }
+
+    private void AddFavourite_Clicked(object sender, EventArgs e)
+    {
+
+    }
+
+    private void CancleMultipleSelection_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == "IsVisible")
+        {
+            IsFavouriteVisible = CancleMultipleSelection.IsVisible;
+            OnPropertyChanged(nameof(IsAddFavouriteVisible));
+        }
     }
 }

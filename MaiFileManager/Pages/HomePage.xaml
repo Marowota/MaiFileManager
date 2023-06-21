@@ -13,7 +13,8 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="auto"/>
                 <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="35"/>
+                <ColumnDefinition Width="auto"/>
+                <ColumnDefinition Width="37"/>
                 <ColumnDefinition Width="10"/>
                 <ColumnDefinition Width="30"/>
                 <ColumnDefinition Width="10"/>
@@ -40,33 +41,44 @@
                    LineBreakMode="TailTruncation"
                    FontAttributes="Bold"
                    FontSize="Title"/>
-            <ImageButton x:Name="SortFileBy"
+            <ImageButton x:Name="AddFavourite"
                          Grid.Column="2"
+                         WidthRequest="45"
+                         Margin="10,0,0,0"
+                         HorizontalOptions="CenterAndExpand"
+                         VerticalOptions="CenterAndExpand"
+                         Source="addfav.png"
+                         Clicked="AddFavourite_Clicked"
+                         BindingContext="{x:Reference homePage}"
+                         IsVisible="{Binding IsAddFavouriteVisible}"/>
+            <ImageButton x:Name="SortFileBy"
+                         Grid.Column="3"
                          HorizontalOptions="CenterAndExpand"
                          VerticalOptions="CenterAndExpand"
                          Source="sort.png"
                          Clicked="SortFileBy_Clicked"/>
             <ImageButton x:Name="SearchFileFolder"
-                         Grid.Column="4"
+                         Grid.Column="5"
                          HorizontalOptions="CenterAndExpand"
                          VerticalOptions="CenterAndExpand"
                          Source="searchfile.png"
                          Clicked="SearchFileFolder_Clicked"/>
             <ImageButton x:Name="AddNewFolder"
-                         Grid.Column="6"
+                         Grid.Column="7"
                          HorizontalOptions="CenterAndExpand"
                          VerticalOptions="CenterAndExpand"
                          Source="newfolder.png"
                          Clicked="AddNewFolder_Clicked"/>
             <ImageButton x:Name="CancleMultipleSelection"
-                         Grid.Column="7"
+                         Grid.Column="8"
                          WidthRequest="30"
                          Margin="10,0,0,0"
                          HorizontalOptions="CenterAndExpand"
                          VerticalOptions="CenterAndExpand"
                          Source="cancel.png"
                          IsVisible="false"
-                         Clicked="CancleMultipleSelection_Clicked"/>
+                         Clicked="CancleMultipleSelection_Clicked"
+                         PropertyChanged="CancleMultipleSelection_PropertyChanged"/>
         </Grid>
     </Shell.TitleView>
     <Grid>
