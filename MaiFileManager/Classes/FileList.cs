@@ -42,11 +42,13 @@ namespace MaiFileManager.Classes
         public int NumberOfCheked { get; set; } = 0;
         private bool isReloading = true;
         public FileSortMode SortMode = (FileSortMode)Preferences.Default.Get("Sort_by", 0);
-        System.Timers.Timer delayTime = new System.Timers.Timer(500);
         public ObservableCollection<FileSystemInfoWithIcon> OperatedFileListView { get; set; } = new ObservableCollection<FileSystemInfoWithIcon>(); 
         public ObservableCollection<FileSystemInfoWithIcon> OperatedCompletedListView { get; set; } = new ObservableCollection<FileSystemInfoWithIcon>(); 
         public ObservableCollection<FileSystemInfoWithIcon> OperatedErrorListView { get; set; } = new ObservableCollection<FileSystemInfoWithIcon>();
-
+        public bool IsFavouriteMode { get; set; } = false;
+        public bool IsNotFavouritePage { get; set; } = true;
+        public string FavouriteFilePath { get; set; } = Path.Combine(FileSystem.Current.AppDataDirectory, "FavFile.txt");
+        public string FavouriteFolderPath { get; set; } = Path.Combine(FileSystem.Current.AppDataDirectory, "FavFolder.txt");
         private double operatedPercent = 0;
         private string operatedStatusString = "";
         public Page NavigatedPage = null;
@@ -97,28 +99,19 @@ namespace MaiFileManager.Classes
         public FileList()
         {
             CurrentDirectoryInfo = new FileManager();
-            InitTimer();
         }
         public FileList(int type)
         {
             CurrentDirectoryInfo = new FileManager(type);
-            InitTimer();
+            if (type == 2)
+            {
+                IsFavouriteMode = true;
+                IsNotFavouritePage = false;
+            }
         }
         public FileList(string path)
         {
             CurrentDirectoryInfo = new FileManager(path);
-            InitTimer();
-        }
-
-        void InitTimer()
-        {
-            delayTime.Interval = 500;
-            delayTime.Elapsed += DelayTime_Elapsed;
-            delayTime.Start();
-        }
-
-        private void DelayTime_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
-        {
         }
 
         public void OnPropertyChanged([CallerMemberName] string name = "") =>
@@ -282,33 +275,79 @@ namespace MaiFileManager.Classes
         internal async Task UpdateFileListAsync()
         {
             IsReloading = true;
-            await Task.Run(async () =>
+            if (BackDeep == 0 && IsFavouriteMode)
             {
-                CurrentFileList.Clear();
-                foreach (FileSystemInfo info in SortFileMode(CurrentDirectoryInfo.GetListFile().ToList()))
+                await Task.Run(async() =>
                 {
-                    await Task.Run(() =>
+                    CurrentFileList.Clear();
+                    //file
+                    if (File.Exists(FavouriteFilePath))
                     {
-                        if (info.GetType() == typeof(FileInfo))
+                        List<string> favList = (await File.ReadAllLinesAsync(FavouriteFilePath)).ToList();
+                        foreach (string fav in favList)
                         {
-                            CurrentFileList.Add(new FileSystemInfoWithIcon(info, MaiIcon.GetIcon(info.Extension), 40));
-                        }
-                        else if (info.GetType() == typeof(DirectoryInfo))
-                        {
-                            CurrentFileList.Add(new FileSystemInfoWithIcon(info, "folder.png", 45));
-                        }
+                            await Task.Run(() =>
+                            {
+                                FileSystemInfo info = new FileInfo(fav);
+                                CurrentFileList.Add(new FileSystemInfoWithIcon(info, MaiIcon.GetIcon(info.Extension), 40));
 
-                    });
-                }
-                if (IsSelectionMode)
-                {
-                    foreach (FileSystemInfoWithIcon f in CurrentFileList)
-                    {
-                        f.CheckBoxSelectVisible = true;
+                            });
+                        }
                     }
-                }
-                NumberOfCheked = 0;
-            });
+                    //folder
+                    if (File.Exists(FavouriteFolderPath))
+                    {
+                        List<string> favList = (await File.ReadAllLinesAsync(FavouriteFolderPath)).ToList();
+                        foreach (string fav in favList)
+                        {
+                            await Task.Run(() =>
+                            {
+                                FileSystemInfo info = new DirectoryInfo(fav);
+                                CurrentFileList.Add(new FileSystemInfoWithIcon(info, "folder.png", 45));
+
+                            });
+                        }
+                    }
+                    if (IsSelectionMode)
+                    {
+                        foreach (FileSystemInfoWithIcon f in CurrentFileList)
+                        {
+                            f.CheckBoxSelectVisible = true;
+                        }
+                    }
+                    NumberOfCheked = 0;
+                });
+            }
+            else
+            {
+                await Task.Run(async () =>
+                {
+                    CurrentFileList.Clear();
+                    foreach (FileSystemInfo info in SortFileMode(CurrentDirectoryInfo.GetListFile().ToList()))
+                    {
+                        await Task.Run(() =>
+                        {
+                            if (info.GetType() == typeof(FileInfo))
+                            {
+                                CurrentFileList.Add(new FileSystemInfoWithIcon(info, MaiIcon.GetIcon(info.Extension), 40));
+                            }
+                            else if (info.GetType() == typeof(DirectoryInfo))
+                            {
+                                CurrentFileList.Add(new FileSystemInfoWithIcon(info, "folder.png", 45));
+                            }
+
+                        });
+                    }
+                    if (IsSelectionMode)
+                    {
+                        foreach (FileSystemInfoWithIcon f in CurrentFileList)
+                        {
+                            f.CheckBoxSelectVisible = true;
+                        }
+                    }
+                    NumberOfCheked = 0;
+                });
+            }
             IsReloading = false;
         }
 
@@ -329,15 +368,24 @@ namespace MaiFileManager.Classes
                 if (selected == null)
                     return -1;
                 int deep = 0;
-                string tmp = selected.FullName;
-                while (tmp != CurrentDirectoryInfo.CurrentDir)
+                string tmp = selected.FullName; 
+                if (BackDeep == 0 && IsFavouriteMode)
                 {
-                    tmp = Path.GetDirectoryName(tmp);
                     deep++;
+                    IsNotFavouritePage = true;
+                    OnPropertyChanged(nameof(IsNotFavouritePage));
+                }
+                else
+                {
+                    while (tmp != CurrentDirectoryInfo.CurrentDir)
+                    {
+                        tmp = Path.GetDirectoryName(tmp);
+                        deep++;
+                    }
                 }
                 CurrentDirectoryInfo.UpdateDir(selected.FullName);
-                await Task.Run(UpdateFileListAsync);
                 UpdateBackDeep(deep);
+                await Task.Run(UpdateFileListAsync);
                 return 1;
             }
             return -1;
@@ -346,7 +394,22 @@ namespace MaiFileManager.Classes
         internal async Task BackAsync(object sender, EventArgs e)
         {
             UpdateBackDeep(-1);
-            CurrentDirectoryInfo.BackDir();
+            if (BackDeep == 0 && IsFavouriteMode)
+            {
+                IsNotFavouritePage = false;
+                OnPropertyChanged(nameof(IsNotFavouritePage));
+                CurrentDirectoryInfo.CurrentDir = "Favourite";
+            }
+            else if (IsFavouriteMode)
+            {
+                IsNotFavouritePage = true;
+                OnPropertyChanged(nameof(IsNotFavouritePage));
+                CurrentDirectoryInfo.BackDir();
+            }
+            else
+            {
+                CurrentDirectoryInfo.BackDir();
+            }
             await UpdateFileListAsync();
         }
         async void CopyDirectory(DirectoryInfo sourceDir, string destinationPath)
@@ -778,6 +841,75 @@ namespace MaiFileManager.Classes
         {
             string invalidList = "|\\?*<\":>+[]/'";
             return (name.IndexOfAny(invalidList.ToCharArray()) == -1);
+        }
+        internal async Task AddOrRemoveFavourite(int mode)
+        {
+            List<string> oldFileList = new List<string>();
+            List<string> oldFolderList = new List<string>();
+            if (!File.Exists(FavouriteFilePath))
+            {
+                File.Create(FavouriteFilePath);
+                oldFileList.Clear();
+            }
+            else
+            {
+                oldFileList = (await File.ReadAllLinesAsync(FavouriteFilePath)).ToList();
+            }
+
+            if (!File.Exists(FavouriteFolderPath))
+            {
+                File.Create(FavouriteFolderPath);
+                oldFolderList.Clear();
+            }
+            else
+            {
+                oldFolderList = (await File.ReadAllLinesAsync(FavouriteFolderPath)).ToList();
+            }
+
+            foreach (FileSystemInfoWithIcon f in CurrentFileList)
+            {
+                if (f.CheckBoxSelected)
+                {
+                    //await Task.Run(() =>
+                    //{
+                        if (f.fileInfo.GetType() == typeof(FileInfo))
+                        {
+                            if (mode == 1)
+                            {
+                                if (!oldFileList.Exists(e => e == f.fileInfo.FullName))
+                                {
+                                    oldFileList.Add(f.fileInfo.FullName);
+                                }
+                            }
+                            else if (mode == 0)
+                            {
+                                oldFileList.Remove(f.fileInfo.FullName);
+                            }
+                        }
+                        else if (f.fileInfo.GetType() == typeof(DirectoryInfo))
+                        {
+                            if (mode == 1)
+                            {
+                                if (!oldFolderList.Exists(e => e == f.fileInfo.FullName))
+                                {
+                                    oldFolderList.Add(f.fileInfo.FullName);
+                                }
+                            }
+                            else if (mode == 0)
+                            {
+                                oldFolderList.Remove(f.fileInfo.FullName);
+                            }
+                        }
+                    //});
+                }
+            }
+
+            await File.WriteAllLinesAsync(FavouriteFilePath, oldFileList);
+            await File.WriteAllLinesAsync(FavouriteFolderPath, oldFolderList);
+            if (mode == 0)
+            {
+                await UpdateFileListAsync();
+            }
         }
     }
 }

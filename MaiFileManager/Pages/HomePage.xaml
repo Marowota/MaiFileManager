@@ -15,10 +15,8 @@
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="auto"/>
                 <ColumnDefinition Width="37"/>
-                <ColumnDefinition Width="10"/>
-                <ColumnDefinition Width="30"/>
-                <ColumnDefinition Width="10"/>
-                <ColumnDefinition Width="40"/>
+                <ColumnDefinition Width="auto"/>
+                <ColumnDefinition Width="auto"/>
                 <ColumnDefinition Width="auto"/>
                 <ColumnDefinition Width="10"/>
             </Grid.ColumnDefinitions>
@@ -51,6 +49,16 @@
                          Clicked="AddFavourite_Clicked"
                          BindingContext="{x:Reference homePage}"
                          IsVisible="{Binding IsAddFavouriteVisible}"/>
+            <ImageButton x:Name="RemoveFavourite"
+                         Grid.Column="2"
+                         WidthRequest="45"
+                         Margin="10,0,0,0"
+                         HorizontalOptions="CenterAndExpand"
+                         VerticalOptions="CenterAndExpand"
+                         Source="delfav.png"
+                         Clicked="RemoveFavourite_Clicked"
+                         BindingContext="{x:Reference homePage}"
+                         IsVisible="{Binding IsRemoveFavouriteVisible}"/>
             <ImageButton x:Name="SortFileBy"
                          Grid.Column="3"
                          HorizontalOptions="CenterAndExpand"
@@ -58,19 +66,26 @@
                          Source="sort.png"
                          Clicked="SortFileBy_Clicked"/>
             <ImageButton x:Name="SearchFileFolder"
-                         Grid.Column="5"
+                         Grid.Column="4"
+                         WidthRequest="30"
+                         Margin="10,0,10,0"
                          HorizontalOptions="CenterAndExpand"
                          VerticalOptions="CenterAndExpand"
                          Source="searchfile.png"
-                         Clicked="SearchFileFolder_Clicked"/>
+                         Clicked="SearchFileFolder_Clicked"
+                         BindingContext="{x:Reference homePage}"
+                         IsVisible="{Binding FileListObj.IsNotFavouritePage}"/>
             <ImageButton x:Name="AddNewFolder"
-                         Grid.Column="7"
+                         Grid.Column="5"
+                         WidthRequest="40"
                          HorizontalOptions="CenterAndExpand"
                          VerticalOptions="CenterAndExpand"
                          Source="newfolder.png"
-                         Clicked="AddNewFolder_Clicked"/>
+                         Clicked="AddNewFolder_Clicked"
+                         BindingContext="{x:Reference homePage}"
+                         IsVisible="{Binding FileListObj.IsNotFavouritePage}"/>
             <ImageButton x:Name="CancleMultipleSelection"
-                         Grid.Column="8"
+                         Grid.Column="6"
                          WidthRequest="30"
                          Margin="10,0,0,0"
                          HorizontalOptions="CenterAndExpand"
@@ -157,13 +172,17 @@
                                 ImageSource="{AppThemeBinding Light=paste.png, Dark=darkpaste.png}"
                                 ContentLayout="Top, 0"
                                 Grid.Column="3"
-                                Clicked="Paste_Clicked"/>
+                                Clicked="Paste_Clicked"
+                                BindingContext="{x:Reference homePage}"
+                                IsVisible="{Binding FileListObj.IsNotFavouritePage}"/>
                 <Button x:Name="Delete"
                                 Text="Delete"
                                 ImageSource="{AppThemeBinding Light=delete.png, Dark=darkdelete.png}"
                                 ContentLayout="Top, 0"
                                 Grid.Column="4"
-                                Clicked="Delete_Clicked"/>
+                                Clicked="Delete_Clicked"
+                                BindingContext="{x:Reference homePage}"
+                                IsVisible="{Binding FileListObj.IsNotFavouritePage}"/>
             </Grid>
         </Border>
         <ActivityIndicator x:Name="LoadingFile" 

@@ -10,8 +10,17 @@
                       Title="Files"
                       ContentTemplate="{DataTemplate pages:HomePage}"/>
         <ShellContent Icon="heart.png"
-                      Title="Favourite"
-                      ContentTemplate="{DataTemplate pages:Favourite}"/>
+                      Title="Favourite">
+            <ShellContent.ContentTemplate>
+                <DataTemplate>
+                    <pages:HomePage>
+                        <x:Arguments>
+                            <x:Int32>2</x:Int32>
+                        </x:Arguments>
+                    </pages:HomePage>
+                </DataTemplate>
+            </ShellContent.ContentTemplate>
+        </ShellContent>
         <ShellContent Icon="download.png"
                       Title="Downloaded">
             <ShellContent.ContentTemplate>

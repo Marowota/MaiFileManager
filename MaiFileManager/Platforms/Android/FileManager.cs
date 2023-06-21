@@ -37,6 +37,9 @@ namespace MaiFileManager.Services
                 case 1:
                     currentDir = Android.OS.Environment.GetExternalStoragePublicDirectory(Android.OS.Environment.DirectoryDownloads).AbsolutePath;
                     break;
+                case 2:
+                    currentDir = "Favourite";
+                    break;
             }
         }
         public partial ObservableCollection<FileSystemInfo> GetListFile()

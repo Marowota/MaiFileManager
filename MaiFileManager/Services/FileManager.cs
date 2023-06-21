@@ -26,6 +26,7 @@ namespace MaiFileManager.Services
         {
             get
             {
+                if (currentDir == "Favourite") return "Favourite";
                 return Path.GetFileName(CurrentDir);
             }
         }

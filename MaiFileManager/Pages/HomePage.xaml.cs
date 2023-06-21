@@ -15,7 +15,6 @@ public partial class HomePage : ContentPage
     bool FirstLoad = true;
     bool IsSearched { get; set; } = false;
     bool IsNavigated { get; set; } = false;
-    bool IsFavouriteMode { get; set; } = false;
     bool IsFavouriteVisible { get; set; } = false;
     public bool IsAddFavouriteVisible
     {
@@ -23,7 +22,29 @@ public partial class HomePage : ContentPage
         {
             if (IsFavouriteVisible)
             {
-                if (IsFavouriteMode)
+                if (FileListObj.IsNotFavouritePage)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            return false;
+        }
+        set
+        {
+            return;
+        }
+    }
+    public bool IsRemoveFavouriteVisible
+    {
+        get
+        {
+            if (IsFavouriteVisible)
+            {
+                if (FileListObj.IsNotFavouritePage)
                 {
                     return false;
                 }
@@ -369,9 +390,22 @@ public partial class HomePage : ContentPage
         await FileListObj.UpdateFileListAsync();
     }
 
-    private void AddFavourite_Clicked(object sender, EventArgs e)
+    private async void AddFavourite_Clicked(object sender, EventArgs e)
     {
+        await FileListObj.AddOrRemoveFavourite(1);
+        await Shell.Current.DisplayAlert("Favourite", "Added to favourite", "OK");
+    }
 
+    private async void RemoveFavourite_Clicked(object sender, EventArgs e)
+    {
+        bool result = await Shell.Current.DisplayAlert("Remove Favourite",
+                                                       "Are you sure you want to remove from favourite?",
+                                                       "Yes",
+                                                       "No");
+        if (result)
+        {
+            await FileListObj.AddOrRemoveFavourite(0);
+        }
     }
 
     private void CancleMultipleSelection_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -380,6 +414,8 @@ public partial class HomePage : ContentPage
         {
             IsFavouriteVisible = CancleMultipleSelection.IsVisible;
             OnPropertyChanged(nameof(IsAddFavouriteVisible));
+            OnPropertyChanged(nameof(IsRemoveFavouriteVisible));
         }
     }
+
 }
