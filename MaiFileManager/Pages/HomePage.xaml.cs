@@ -392,7 +392,7 @@ public partial class HomePage : ContentPage
 
     private async void AddFavourite_Clicked(object sender, EventArgs e)
     {
-        await FileListObj.AddOrRemoveFavourite(1);
+        await FileListObj.AddOrRemoveFavouriteAsync(1);
         await Shell.Current.DisplayAlert("Favourite", "Added to favourite", "OK");
     }
 
@@ -404,7 +404,7 @@ public partial class HomePage : ContentPage
                                                        "No");
         if (result)
         {
-            await FileListObj.AddOrRemoveFavourite(0);
+            await FileListObj.AddOrRemoveFavouriteAsync(0);
         }
     }
 

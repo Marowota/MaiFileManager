@@ -562,6 +562,7 @@ namespace MaiFileManager.Classes
         }
         internal async Task RenameModeAsync(string path, string newName)
         {
+            bool isInFavourite = await IsInFavouriteAsync(path);
             if (Directory.Exists(path))
             {
                 string newPath = Path.Combine(Directory.GetParent(path).FullName, newName);
@@ -582,7 +583,17 @@ namespace MaiFileManager.Classes
                     });
                     return;
                 }
-                Directory.Move(path, newPath);
+                if (isInFavourite)
+                {
+                    FileSystemInfo f = new DirectoryInfo(path);
+                    await AddOrRemoveFavouriteAsync(0, f, true);
+                }
+                Directory.Move(path, newPath); 
+                if (isInFavourite)
+                {
+                    FileSystemInfo f = new DirectoryInfo(newPath);
+                    await AddOrRemoveFavouriteAsync(1, f, true);
+                }
             }
             else if (File.Exists(path))
             {
@@ -604,8 +615,17 @@ namespace MaiFileManager.Classes
                     });
                     return;
                 }
-
+                if (isInFavourite)
+                {
+                    FileSystemInfo f = new FileInfo(path);
+                    await AddOrRemoveFavouriteAsync(0, f, true);
+                }
                 File.Move(path, newPath);
+                if (isInFavourite)
+                {
+                    FileSystemInfo f = new FileInfo(newPath);
+                    await AddOrRemoveFavouriteAsync(1, f, true);
+                }
             }
         }
         internal async Task PasteModeAsync()
@@ -842,7 +862,42 @@ namespace MaiFileManager.Classes
             string invalidList = "|\\?*<\":>+[]/'";
             return (name.IndexOfAny(invalidList.ToCharArray()) == -1);
         }
-        internal async Task AddOrRemoveFavourite(int mode)
+        //1 Add 0 Remove
+        private async Task FavouriteAR(FileSystemInfo f, int mode, List<string> oldFileList, List<string> oldFolderList)
+        {
+            await Task.Run(() =>
+            {
+                if (f.GetType() == typeof(FileInfo))
+                {
+                    if (mode == 1)
+                    {
+                        if (!oldFileList.Exists(e => e == f.FullName))
+                        {
+                            oldFileList.Add(f.FullName);
+                        }
+                    }
+                    else if (mode == 0)
+                    {
+                        oldFileList.Remove(f.FullName);
+                    }
+                }
+                else if (f.GetType() == typeof(DirectoryInfo))
+                {
+                    if (mode == 1)
+                    {
+                        if (!oldFolderList.Exists(e => e == f.FullName))
+                        {
+                            oldFolderList.Add(f.FullName);
+                        }
+                    }
+                    else if (mode == 0)
+                    {
+                        oldFolderList.Remove(f.FullName);
+                    }
+                }
+            });
+        }
+        internal async Task AddOrRemoveFavouriteAsync(int mode, FileSystemInfo path = null, bool isReloadOff = false)
         {
             List<string> oldFileList = new List<string>();
             List<string> oldFolderList = new List<string>();
@@ -864,50 +919,55 @@ namespace MaiFileManager.Classes
                 oldFolderList = (await File.ReadAllLinesAsync(FavouriteFolderPath)).ToList();
             }
 
-            foreach (FileSystemInfoWithIcon f in CurrentFileList)
+            if (path == null)
             {
-                if (f.CheckBoxSelected)
+                foreach (FileSystemInfoWithIcon f in CurrentFileList.ToList())
                 {
-                    //await Task.Run(() =>
-                    //{
-                        if (f.fileInfo.GetType() == typeof(FileInfo))
-                        {
-                            if (mode == 1)
-                            {
-                                if (!oldFileList.Exists(e => e == f.fileInfo.FullName))
-                                {
-                                    oldFileList.Add(f.fileInfo.FullName);
-                                }
-                            }
-                            else if (mode == 0)
-                            {
-                                oldFileList.Remove(f.fileInfo.FullName);
-                            }
-                        }
-                        else if (f.fileInfo.GetType() == typeof(DirectoryInfo))
-                        {
-                            if (mode == 1)
-                            {
-                                if (!oldFolderList.Exists(e => e == f.fileInfo.FullName))
-                                {
-                                    oldFolderList.Add(f.fileInfo.FullName);
-                                }
-                            }
-                            else if (mode == 0)
-                            {
-                                oldFolderList.Remove(f.fileInfo.FullName);
-                            }
-                        }
-                    //});
+                    if (f.CheckBoxSelected)
+                    {
+                        await FavouriteAR(f.fileInfo, mode, oldFileList, oldFolderList);
+                    }
                 }
+            }
+            else
+            {
+                await FavouriteAR(path, mode, oldFileList, oldFolderList);
             }
 
             await File.WriteAllLinesAsync(FavouriteFilePath, oldFileList);
             await File.WriteAllLinesAsync(FavouriteFolderPath, oldFolderList);
-            if (mode == 0)
+            if (mode == 0 && (!isReloadOff))
             {
                 await UpdateFileListAsync();
             }
+        }
+        private async Task<bool> IsInFavouriteAsync(string f)
+        {
+            List<string> oldFileList = new List<string>();
+            List<string> oldFolderList = new List<string>();
+            if (!File.Exists(FavouriteFilePath))
+            {
+                oldFileList.Clear();
+            }
+            else
+            {
+                oldFileList = (await File.ReadAllLinesAsync(FavouriteFilePath)).ToList();
+            }
+
+            if (!File.Exists(FavouriteFolderPath))
+            {
+                oldFolderList.Clear();
+            }
+            else
+            {
+                oldFolderList = (await File.ReadAllLinesAsync(FavouriteFolderPath)).ToList();
+            }
+
+            if (oldFileList.Contains(f) || oldFolderList.Contains(f))
+            {
+                return true;
+            }
+            return false;
         }
     }
 }
