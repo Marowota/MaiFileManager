@@ -444,6 +444,10 @@ namespace MaiFileManager.Classes
                         File.Move(string.Format("{0}{1}", targetFilePath, num), targetFilePath);
                     }
                 }
+                else
+                {
+                    file.CopyTo(targetFilePath);
+                }    
             }
 
             foreach (DirectoryInfo directory in sourceDirTemp)
