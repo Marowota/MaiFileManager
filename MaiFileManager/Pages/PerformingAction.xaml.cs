@@ -64,15 +64,15 @@ public partial class PerformingAction : ContentPage
         {
             case ActionType.paste:
                 await this.Dispatcher.DispatchAsync( () => {
-                    lblType.Text = (currentFileListObj.OperatedOption == FileList.FileSelectOption.Cut ? "Moving..." :
-                                                  currentFileListObj.OperatedOption == FileList.FileSelectOption.Copy ? "Copying..." : "Do nothing...");
+                    lblType.Text = (FileList.OperatedOption == FileList.FileSelectOption.Cut ? "Moving..." :
+                                                  FileList.OperatedOption == FileList.FileSelectOption.Copy ? "Copying..." : "Do nothing...");
                 });
               
                 await currentFileListObj.PasteModeAsync(); 
                 
                 await this.Dispatcher.DispatchAsync(() => {
-                    lblType.Text = (currentFileListObj.OperatedOption == FileList.FileSelectOption.Cut ? "Moved" :
-                                currentFileListObj.OperatedOption == FileList.FileSelectOption.Copy ? "Copied" : "Did nothing!");
+                    lblType.Text = (FileList.OperatedOption == FileList.FileSelectOption.Cut ? "Moved" :
+                                FileList.OperatedOption == FileList.FileSelectOption.Copy ? "Copied" : "Did nothing!");
                 });
                 break;
             case ActionType.delete:
@@ -94,7 +94,7 @@ public partial class PerformingAction : ContentPage
         }
         reloadTimer.Stop();
         gridProcessing.IsVisible = false;
-        currentFileListObj.OperatedOption = FileList.FileSelectOption.None;
+        FileList.OperatedOption = FileList.FileSelectOption.None;
         currentFileListObj.NavigatedPage = null;
         currentProcessingFile = null;
         await this.Dispatcher.DispatchAsync(() =>
@@ -131,5 +131,12 @@ public partial class PerformingAction : ContentPage
     private async void ActionButton_Clicked(object sender, EventArgs e)
     {
         await Navigation.PopModalAsync();
+    }
+
+    private void PerformActionPage_Disappearing(object sender, EventArgs e)
+    {
+        FileList.OperatedFileList.Clear();
+        currentFileListObj.OperatedCompletedListView.Clear();
+        currentFileListObj.OperatedErrorListView.Clear();
     }
 }

@@ -36,8 +36,8 @@ namespace MaiFileManager.Classes
         public ObservableCollection<FileSystemInfoWithIcon> CurrentFileList { get; set; } = new ObservableCollection<FileSystemInfoWithIcon>();
         public FileManager CurrentDirectoryInfo { get; set; }
         public int BackDeep {get; set;} = 0;
-        public FileSelectOption OperatedOption { get; set; } = FileSelectOption.None;
-        public ObservableCollection<FileSystemInfoWithIcon> OperatedFileList { get; set; } = new ObservableCollection<FileSystemInfoWithIcon>();
+        public static FileSelectOption OperatedOption { get; set; } = FileSelectOption.None;
+        public static ObservableCollection<FileSystemInfoWithIcon> OperatedFileList { get; set; } = new ObservableCollection<FileSystemInfoWithIcon>();
         public bool IsSelectionMode { get; set; } = false;
         public int NumberOfCheked { get; set; } = 0;
         private bool isReloading = true;
