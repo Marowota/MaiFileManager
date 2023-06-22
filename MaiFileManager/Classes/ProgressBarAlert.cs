@@ -1,5 +1,4 @@
-﻿using CommunityToolkit.Maui.Views;
-using Microsoft.Maui.Controls.Shapes;
+﻿using Microsoft.Maui.Controls.Shapes;
 using Microsoft.Maui.Layouts;
 using System;
 using System.Collections.Generic;

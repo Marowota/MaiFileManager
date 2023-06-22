@@ -1,5 +1,4 @@
-﻿using CommunityToolkit.Maui.Core.Primitives;
-using MaiFileManager.Services;
+﻿using MaiFileManager.Services;
 using Microsoft.Maui.Dispatching;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
