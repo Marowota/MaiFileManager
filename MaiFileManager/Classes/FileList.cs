@@ -672,6 +672,13 @@ namespace MaiFileManager.Classes
                 {
                     case FileSelectOption.Cut:
                         {
+                            bool isInFavourite = await IsInFavouriteAsync(f.fileInfo.FullName);
+                            string fileFullName = "";
+                            if (isInFavourite)
+                            {
+                                fileFullName = f.fileInfo.FullName;
+                            }
+                            bool canceled = false;
                             if (f.fileInfo.GetType() == typeof(FileInfo))
                             {
                                 string targetFilePath = Path.Combine(CurrentDirectoryInfo.CurrentDir, f.fileInfo.Name);
@@ -690,6 +697,7 @@ namespace MaiFileManager.Classes
                                     }
                                     else
                                     {
+                                        canceled = true;
                                         OperatedFileListView.Remove(f);
                                         OperatedErrorListView.Add(f);
                                         OperatedPercent = (double)(OperatedFileList.Count - OperatedFileListView.Count) / OperatedFileList.Count;
@@ -699,6 +707,11 @@ namespace MaiFileManager.Classes
                                 else
                                 {
                                     (f.fileInfo as FileInfo).MoveTo(targetFilePath);
+                                }
+                                if (!canceled && isInFavourite)
+                                {
+                                    await AddOrRemoveFavouriteAsync(0, true, null, fileFullName, 0);
+                                    await AddOrRemoveFavouriteAsync(1, true, null, targetFilePath, 0);
                                 }
                             }
                             else if (f.fileInfo.GetType() == typeof(DirectoryInfo))
@@ -716,6 +729,7 @@ namespace MaiFileManager.Classes
                                         tmp = NavigatedPage;
                                     }
                                     await tmp.Dispatcher.DispatchAsync(async () => { await tmp.DisplayAlert("Error", f.fileInfo.Name + "\nCannot cut to itself", "OK"); });
+                                    canceled = true;
                                     OperatedFileListView.Remove(f);
                                     OperatedErrorListView.Add(f);
                                     OperatedPercent = (double)(OperatedFileList.Count - OperatedFileListView.Count) / OperatedFileList.Count;
@@ -733,12 +747,18 @@ namespace MaiFileManager.Classes
                                         tmp = NavigatedPage;
                                     }
                                     await tmp.Dispatcher.DispatchAsync(async () => { await tmp.DisplayAlert("Error", f.fileInfo.Name + "\nDirectory/File with same name already exists", "OK"); });
+                                    canceled = true;
                                     OperatedFileListView.Remove(f);
                                     OperatedErrorListView.Add(f);
                                     OperatedPercent = (double)(OperatedFileList.Count - OperatedFileListView.Count) / OperatedFileList.Count;
                                     continue;
                                 }
-                                (f.fileInfo as DirectoryInfo).MoveTo(targetFilePath);
+                                (f.fileInfo as DirectoryInfo).MoveTo(targetFilePath); 
+                                if (!canceled && isInFavourite)
+                                {
+                                    await AddOrRemoveFavouriteAsync(0, true, null, fileFullName, 1);
+                                    await AddOrRemoveFavouriteAsync(1, true, null, targetFilePath, 1);
+                                }
                             }
                             break;
                         }
