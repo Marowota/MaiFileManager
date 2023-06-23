@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
+using Android.OS;
 using MaiFileManager.Classes;
 using MaiFileManager.Services;
 using Org.W3c.Dom.LS;
@@ -341,6 +342,11 @@ public partial class HomePage : ContentPage
     }
     private async void SearchBarFile_SearchButtonPressed(object sender, EventArgs e)
     {
+        if (Build.VERSION.SdkInt >= BuildVersionCodes.R && FileListObj.CurrentDirectoryInfo.CurrentDir == "/storage/emulated/0")
+        {
+            await Shell.Current.DisplayAlert("Unable", "This action can't be done in this folder", "OK");
+            return;
+        }
         if (SearchBarFile.Text == null) return;
         if (FileListObj.IsValidFileName(SearchBarFile.Text))
         {

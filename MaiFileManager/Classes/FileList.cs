@@ -1,4 +1,5 @@
-﻿using MaiFileManager.Services;
+﻿using Android.OS;
+using MaiFileManager.Services;
 using Microsoft.Maui.Dispatching;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -120,15 +121,21 @@ namespace MaiFileManager.Classes
         #region Permission
         private async Task<bool> RequestPermAsync()
         {
-
-            var statusW = await Permissions.CheckStatusAsync<Permissions.StorageWrite>();
-            if (statusW != PermissionStatus.Granted)
-            {
-                statusW = await Permissions.RequestAsync<Permissions.StorageWrite>();
-            }
-            if (statusW != PermissionStatus.Granted)
+            if (Build.VERSION.SdkInt >= BuildVersionCodes.R)
             {
                 return CurrentDirectoryInfo.GetPerm();
+            }
+            else
+            {
+                var statusW = await Permissions.CheckStatusAsync<Permissions.StorageWrite>();
+                if (statusW != PermissionStatus.Granted)
+                {
+                    statusW = await Permissions.RequestAsync<Permissions.StorageWrite>();
+                }
+                if (statusW != PermissionStatus.Granted)
+                {
+                    return false;
+                }
             }
             return true;
         }
@@ -326,7 +333,12 @@ namespace MaiFileManager.Classes
                     {
                         await Task.Run(() =>
                         {
-                            if (info.GetType() == typeof(FileInfo))
+                            if (string.Equals(info.FullName, "/storage/emulated/0/android", StringComparison.CurrentCultureIgnoreCase) 
+                                && Build.VERSION.SdkInt >= BuildVersionCodes.R)
+                            {
+                               
+                            }
+                            else if (info.GetType() == typeof(FileInfo))
                             {
                                 CurrentFileList.Add(new FileSystemInfoWithIcon(info, MaiIcon.GetIcon(info.Extension), 40));
                             }
