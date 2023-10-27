@@ -3,8 +3,8 @@
 A simple yet powerful with neat-UI file manager for Android, developed with the latest technology of .NET Multi-platform App UI (.NET MAUI: https://dotnet.microsoft.com/en-us/apps/maui).
 
 Made with 💖 by Marowota
-Best support for Android 10
 
+Best support for Android 10
 
 ## Main functionality
 
