@@ -20,7 +20,7 @@ Best support for Android 10
 
 ## Images
 
-More image in [SampleImage](SampleImage/) SampleImage folder
+More image in [SampleImage](SampleImage/) folder
 
 ![Homepage](SampleImage/1.png)
 
