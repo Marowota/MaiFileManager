@@ -5,7 +5,6 @@ A simple yet powerful with neat-UI file manager for Android, developed with the 
 Made with <3 by Marowota
 Best support for Android 10
 
-![Homepage](SampleImage/1.png)
 
 ## Main functionality
 
@@ -21,10 +20,13 @@ Best support for Android 10
 
 ## Images
 
+More image in [SampleImage](SampleImage/) SampleImage folder
+
+![Homepage](SampleImage/1.png)
+
 ![Favourite](SampleImage/3.png)
 
 ![Downloadpage](SampleImage/2.png)
 
 ![Copypage](SampleImage/9.png)
 
-More image in [SampleImage](SampleImage/) SampleImage folder
