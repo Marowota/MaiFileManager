@@ -8,8 +8,8 @@ Best support for Android 10
 
 ## Main functionality
 
-- View files and folder 📁
-- Show the file size 🏋️‍♂️
+- View files and folder with ability to show long file name easily 📁
+- File size and last modified date for files 🏋️‍♂️
 - Add files/folder to favourite for easy access 💖
 - Fully cut/copy/paste/delete support with progress UI\* ✨
 - Darkmode 🌙
