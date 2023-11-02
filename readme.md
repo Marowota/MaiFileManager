@@ -22,11 +22,11 @@ Best support for Android 10
 
 More image in [SampleImage](SampleImage/) folder
 
-![Homepage](SampleImage/1.png)
+<p float="left">
+  <img src="/SampleImage/1.png" width="49%" />
+  <img src="/SampleImage/3.png" width="49%" /> 
+  <img src="/SampleImage/2.png" width="49%" />  
+  <img src="/SampleImage/9.png" width="49%" />
+</p>
 
-![Favourite](SampleImage/3.png)
-
-![Downloadpage](SampleImage/2.png)
-
-![Copypage](SampleImage/9.png)
 
